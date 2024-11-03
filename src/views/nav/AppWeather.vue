@@ -32,6 +32,7 @@ export default {
       let response = await axios.post(`/weather`, {
         city: this.find,
       });
+      console.log(response);
       this.today = response.data.today;
       this.tomorrow = response.data.tomorrow;
       this.twoWeeks = response.data.twoWeeks;

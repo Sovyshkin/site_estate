@@ -14,7 +14,7 @@ const mkdirp = require("mkdirp");
 const nodemailer = require("nodemailer");
 
 const TelegramApi = require("node-telegram-bot-api");
-const tokenBot = "6512089922:AAEkul2Yw8aIIfh0A4vSypeC1kXJaTNDs9Y";
+const tokenBot = "6512089922:AAEYdrW_8UsZ4OOfXSNLTqsRttt0xxL29cw";
 
 // let bot = false;
 
@@ -2543,22 +2543,23 @@ app.post(`/weather`, async function (req, res) {
   try {
     let { city } = req.body;
     let today, tomorrow, twoWeeks, month;
-    city = "Оренбург";
+
     await gismeteo.getToday(city).then((data) => {
       today = data;
+      res.send({ today });
     });
-    await gismeteo.getTomorrow(city).then((data) => {
-      console.log("Tomorrow", data);
-      tomorrow = data;
-    });
-    await gismeteo.getTwoWeeks(city).then((data) => {
-      twoWeeks = data;
-    });
-    await gismeteo.getMonth(city).then((data) => {
-      month = data;
-    });
+    // await gismeteo.getTomorrow(city).then((data) => {
+    //   console.log("Tomorrow", data);
+    //   tomorrow = data;
+    // });
+    // await gismeteo.getTwoWeeks(city).then((data) => {
+    //   twoWeeks = data;
+    // });
+    // await gismeteo.getMonth(city).then((data) => {
+    //   month = data;
+    // });
 
-    res.send({ today, tomorrow, twoWeeks, month });
+    // res.send({ today, tomorrow, twoWeeks, month });
   } catch (err) {
     console.log(err);
   }

@@ -6,6 +6,7 @@ import axios from "axios";
 import store from "./store/store";
 // при пустом url запросы автоматически идут на исходный сервер,
 // поэтому коренной рут по сути не нужен
+// axios.defaults.baseURL = "http://localhost:3005/";
 axios.defaults.baseURL = "";
 
 const app = createApp(App);
