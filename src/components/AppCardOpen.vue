@@ -5,6 +5,9 @@ import { defineComponent } from "vue";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
 import { Carousel, Navigation, Slide, Pagination } from "vue3-carousel";
+import path from "path";
+
+const assetsPath = path.resolve(__dirname, "../public_html/dist/assets");
 
 import "vue3-carousel/dist/carousel.css";
 
@@ -522,7 +525,7 @@ export default defineComponent({
     },
     getImage(name) {
       try {
-        return require(`./dist/assets/${name}`);
+        return require(path.join(assetsPath, name));
       } catch (err) {
         console.log(err);
       }
