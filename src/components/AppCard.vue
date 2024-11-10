@@ -1,4 +1,5 @@
 <script>
+import axios from "axios";
 export default {
   props: {
     img: String,
@@ -6,7 +7,7 @@ export default {
     p: String,
     price: Number,
     i: Number,
-    id: Number,
+    id: String,
     children: Number,
     adults: Number,
     target: Number,
@@ -14,7 +15,11 @@ export default {
     fromMyAds: Boolean,
     done: Boolean,
   },
-  data() {},
+  data() {
+    return {
+      countReqs: 0,
+    };
+  },
   methods: {
     open() {
       if (this.fromMyAds) {
@@ -32,8 +37,44 @@ export default {
     sendVariable() {
       this.$emit("variable", { target: 1, numberid: this.i });
     },
+
+    async load_info() {
+      try {
+        let response = await axios.post(`/card`, {
+          id: this.id,
+          clientID: this.getCookieValue("id"),
+          name: this.nameCard,
+        });
+        this.countReqs = response.data.countReqs;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    getCookieValue(name) {
+      const cookies = document.cookie.split("; ");
+      let res;
+      for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i];
+        if (cookie.slice(0, 2) == name) {
+          res = cookie.replace(name + "=", "");
+        }
+      }
+      return res;
+    },
+    getImage(name) {
+      try {
+        return require(`/dist/assets/${name}`);
+      } catch (err) {
+        console.log(err);
+      }
+    },
   },
-  mounted() {},
+  mounted() {
+    if (this.id) {
+      this.load_info();
+    }
+  },
 };
 </script>
 
@@ -43,7 +84,7 @@ export default {
       v-if="img"
       class="card-img-top"
       @click="open"
-      :src="'/assets/' + Array.from(img)[0]"
+      :src="getImage(Array.from(img)[0])"
       alt=""
     />
     <div class="card-body">
@@ -92,6 +133,7 @@ export default {
       </div>
     </div>
     <div v-if="done" class="done">Снято с публикации</div>
+    <div class="alert" v-if="countReqs">{{ countReqs }}</div>
   </div>
 </template>
 

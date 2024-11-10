@@ -17,7 +17,7 @@ export default {
   <div class="wrapper-main">
     <div class="container">
       <button class="webBack" @click="click_go">
-        <img src="assets/arrow-down-sign-to-navigate.png" alt="" />
+        <img src="/assets/arrow-down-sign-to-navigate.png" alt="" />
       </button>
       <RouterView />
     </div>

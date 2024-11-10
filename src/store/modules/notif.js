@@ -1,5 +1,6 @@
 import axios from "axios";
-axios.defaults.baseURL = "http://localhost:3005";
+// axios.defaults.baseURL = "http://localhost:3005";
+axios.defaults.baseURL = "";
 export default {
   actions: {
     async getNotifications(ctx, nameModel) {

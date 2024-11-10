@@ -526,6 +526,13 @@ export default defineComponent({
         return foundCityTo;
       }
     },
+    getImage(name) {
+      try {
+        return require(`/dist/assets/${name}`);
+      } catch (err) {
+        console.log(err);
+      }
+    },
   },
   async mounted() {
     await this.checkClone();
@@ -578,7 +585,7 @@ export default defineComponent({
               <Slide v-for="slide in img" :key="slide">
                 <div class="carousel__item">
                   <div class="imgCross">
-                    <img :src="`/assets/` + slide" alt="" />
+                    <img :src="getImage(slide)" alt="" />
                     <button @click="remove(slide)" class="cross">
                       <ion-icon name="close-outline"></ion-icon>
                     </button>

@@ -29,12 +29,17 @@ export default defineComponent({
       editB: false,
       confirm: false,
       id: "",
+      countReqs: 0,
     };
   },
-  mounted() {
-    this.loadCard();
-  },
   methods: {
+    getImage(name) {
+      try {
+        return require(`/dist/assets/${name}`);
+      } catch (err) {
+        console.log(err);
+      }
+    },
     getCookieValue(name) {
       const cookies = document.cookie.split("; ");
       let res;
@@ -57,6 +62,7 @@ export default defineComponent({
       });
       this.INFO = response.data.transfer;
       this.passenger2 = this.INFO.passenger / 2;
+      this.countReqs = response.data.countReqs;
       if (this.id == this.INFO.userID) {
         this.admin = true;
       } else {
@@ -172,6 +178,9 @@ export default defineComponent({
       }, 3000);
     },
   },
+  mounted() {
+    this.loadCard();
+  },
 });
 </script>
 
@@ -181,7 +190,7 @@ export default defineComponent({
       <Carousel :autoplay="4000" :wrap-around="true">
         <Slide v-for="slide in INFO.img" :key="slide">
           <div class="carousel__item">
-            <img :src="`/assets/` + slide" alt="" />
+            <img :src="getImage(slide)" alt="" />
           </div>
         </Slide>
 
@@ -217,7 +226,7 @@ export default defineComponent({
             </div>
             <div class="second">
               <span>{{ INFO.cityto }}</span>
-              <div class="wrapsvg">
+              <!-- <div class="wrapsvg">
                 <div
                   class="circlesvg"
                   :class="{
@@ -259,7 +268,7 @@ export default defineComponent({
                 >
                   <ion-icon name="person"></ion-icon>
                 </div>
-              </div>
+              </div> -->
             </div>
           </div>
         </div>
@@ -268,7 +277,7 @@ export default defineComponent({
           <span>Итого за 1 пассажира {{ INFO.price_sit }} ₽</span>
         </div>
         <div class="passenger-price">
-          <span>Комментарии: {{ INFO.komm }} ₽</span>
+          <span>Комментарии: {{ INFO.komm }}</span>
         </div>
         <hr />
         <div class="driver">
@@ -276,7 +285,7 @@ export default defineComponent({
         </div>
         <div class="driver">
           <span class="text-center mt-3"
-            >Длительность поездки (в часах): {{ INFO.length }}</span
+            >Длительность поездки (час): {{ INFO.length }}</span
           >
         </div>
         <div class="driver">
@@ -303,6 +312,7 @@ export default defineComponent({
         </button>
         <button v-if="editB" @click="goBrone" class="btn btn-secondary">
           Запросы бронирования
+          <div class="alert" v-if="countReqs">{{ countReqs }}</div>
         </button>
         <button
           @click="deleteCard"
@@ -362,7 +372,7 @@ export default defineComponent({
   font-weight: 550;
 }
 .card {
-  color: black;
+  color: #fff;
 }
 .driver span {
   border-bottom: 1px solid #ffffff72;
@@ -636,6 +646,10 @@ button:active {
 
 .address {
   font-size: 1rem !important;
+}
+
+.btn {
+  position: relative;
 }
 
 @media (max-width: 1250px) {

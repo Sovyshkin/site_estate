@@ -129,6 +129,7 @@ export default {
           v-for="(card, index) in transfers"
           :key="index"
           :i="index"
+          :id="card.id"
           :name="card.name"
           :cityfrom="card.cityfrom"
           :cityto="card.cityto"

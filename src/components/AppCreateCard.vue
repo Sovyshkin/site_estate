@@ -30,7 +30,7 @@ export default defineComponent({
       workbook: "",
       createn: 0,
       brony: 0,
-      category: this.$route.query.category,
+      category: this.$route.query.name,
       subcategory: this.$route.query.subcategory,
       namebrony: {
         title: "название",
@@ -91,6 +91,7 @@ export default defineComponent({
       transfer_mountain: "",
       live_whith_animals: "",
       additional: "",
+      clone: false,
     };
   },
   mounted() {
@@ -99,7 +100,7 @@ export default defineComponent({
   methods: {
     async create() {},
     handleFilesUpload() {
-      if (this.edit || this.clone) {
+      if (this.edit) {
         this.img = ``;
         if (this.files) {
           let files = Array.from(this.files);
@@ -356,50 +357,62 @@ export default defineComponent({
     async loadCard() {
       let id = this.$route.query.id;
       let name = this.$route.query.name;
+      console.log(id, name);
       if (id && name) {
         let response = await axios.post(`/card`, {
           id: id,
           name: name,
+          clientID: 0,
         });
         this.edit = this.$route.query.edit;
         this.INFO = response.data.card;
-        console.log(this.INFO);
-        this.img = this.INFO.img;
-        this.title = this.INFO.title;
-        this.price = this.INFO.price;
-        this.phone = this.INFO.phone;
-        this.address = this.INFO.address;
-        this.description = this.INFO.p;
-        this.email = this.INFO.email;
-        this.floor = this.INFO.floor;
-        this.lease_term = this.INFO.lease_term;
-        this.total_area = this.INFO.total_area;
-        this.sleeping_rooms = this.INFO.sleeping_rooms;
-        this.sleeping_places = this.INFO.sleeping_places;
-        this.children_bed = this.INFO.children_bed;
-        this.double_places = this.INFO.double_places;
-        this.single_spaces = this.INFO.single_spaces;
-        this.additional_sleeping_places = this.INFO.additional_sleeping_places;
-        this.bathrooms = this.INFO.bathrooms;
-        this.bathrooms_showers = this.INFO.bathrooms_showers;
-        this.drying_for_inventory = this.INFO.drying_for_inventory;
-        this.wifi = this.INFO.wifi;
-        this.warm_floor = this.INFO.warm_floor;
-        this.dishwasher = this.INFO.dishwasher;
-        this.parking_cars = this.INFO.parking_cars;
-        this.mall = this.INFO.mall;
-        this.kazan = this.INFO.kazan;
-        this.bath_territory = this.INFO.bath_territory;
-        this.pool = this.INFO.pool;
-        this.poolAllYear = this.INFO.poolAllYear;
-        this.poolOnlySummer = this.INFO.poolOnlySummer;
-        this.poolOpen = this.INFO.poolOpen;
-        this.poolClose = this.INFO.poolClose;
-        this.poolHeating = this.INFO.poolHeating;
-        this.transfer_city = this.INFO.transfer_city;
-        this.transfer_mountain = this.INFO.transfer_mountain;
-        this.live_whith_animals = this.INFO.live_whith_animals;
-        this.additionally = this.INFO.additionally;
+        console.log(response);
+        if (this.INFO) {
+          this.img = this.INFO.img;
+          this.title = this.INFO.title;
+          this.price = this.INFO.price;
+          this.phone = this.INFO.phone;
+          this.address = this.INFO.address;
+          this.description = this.INFO.p;
+          this.email = this.INFO.email;
+          this.floor = this.INFO.floor;
+          this.lease_term = this.INFO.lease_term;
+          this.total_area = this.INFO.total_area;
+          this.sleeping_rooms = this.INFO.sleeping_rooms;
+          this.sleeping_places = this.INFO.sleeping_places;
+          this.children_bed = this.INFO.children_bed;
+          this.double_places = this.INFO.double_places;
+          this.single_spaces = this.INFO.single_spaces;
+          this.additional_sleeping_places =
+            this.INFO.additional_sleeping_places;
+          this.bathrooms = this.INFO.bathrooms;
+          this.bathrooms_showers = this.INFO.bathrooms_showers;
+          this.drying_for_inventory = this.INFO.drying_for_inventory;
+          this.wifi = this.INFO.wifi;
+          this.warm_floor = this.INFO.warm_floor;
+          this.dishwasher = this.INFO.dishwasher;
+          this.parking_cars = this.INFO.parking_cars;
+          this.mall = this.INFO.mall;
+          this.kazan = this.INFO.kazan;
+          this.bath_territory = this.INFO.bath_territory;
+          this.pool = this.INFO.pool;
+          this.poolAllYear = this.INFO.poolAllYear;
+          this.poolOnlySummer = this.INFO.poolOnlySummer;
+          this.poolOpen = this.INFO.poolOpen;
+          this.poolClose = this.INFO.poolClose;
+          this.poolHeating = this.INFO.poolHeating;
+          this.transfer_city = this.INFO.transfer_city;
+          this.transfer_mountain = this.INFO.transfer_mountain;
+          this.live_whith_animals = this.INFO.live_whith_animals;
+          this.additionally = this.INFO.additionally;
+        }
+      }
+    },
+    getImage(name) {
+      try {
+        return require(`/dist/assets/${name}`);
+      } catch (err) {
+        console.log(err);
       }
     },
   },
@@ -740,7 +753,7 @@ export default defineComponent({
           <Slide v-for="slide in img" :key="slide">
             <div class="carousel__item">
               <div class="imgCross">
-                <img :src="`/assets/` + slide" alt="" />
+                <img :src="getImage(slide)" alt="" />
                 <button @click="remove(slide)" class="cross">
                   <ion-icon name="close-outline"></ion-icon>
                 </button>

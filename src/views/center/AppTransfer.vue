@@ -341,7 +341,6 @@ export default {
         let day = {
           count: 0,
           date: "",
-          min_price: 999999,
           transfers: [],
         };
         let lastDay = {
@@ -351,12 +350,6 @@ export default {
           let transfer = days[i];
           if (transfer.datefrom == lastDay.datefrom) {
             day.count += 1;
-            if (transfer.price_sit <= day.min_price) {
-              day.min_price = transfer.price_sit;
-            }
-            // day.average_price = Math.floor(
-            //   (lastDay.price_sit + transfer.price_sit) / day.count
-            // );
             day.transfers.push(transfer);
           } else {
             if (day.count > 0) {
@@ -365,7 +358,6 @@ export default {
             day = {
               count: 1,
               date: transfer.datefrom,
-              min_price: transfer.price_sit,
               transfers: [transfer],
             };
           }
@@ -487,7 +479,6 @@ export default {
             >
               <span>{{ show_day(day.date) }}</span>
               <span>Поездок в этот день - {{ day.count }}</span>
-              <span>Минимальная цена билета - {{ day.min_price }} руб.</span>
             </div>
           </div>
         </form>

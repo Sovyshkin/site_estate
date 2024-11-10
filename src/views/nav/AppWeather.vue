@@ -6,73 +6,61 @@ import "dayjs/locale/ru";
 export default {
   data() {
     return {
-      today: {},
-      tomorrow: {},
-      twoWeeks: {},
-      month: {},
-      find: `Шерегеш`,
       target: "сегодня",
       index: 0,
-      weather: {},
-      dayHours: [
-        "2:00",
-        "5:00",
-        "8:00",
-        "11:00",
-        "14:00",
-        "17:00",
-        "20:00",
-        "23:00",
-      ],
-      monthDays: [],
+      days: [],
+      data: [],
     };
   },
   methods: {
     async loadWeather() {
-      let response = await axios.post(`/weather`, {
-        city: this.find,
-      });
-      console.log(response);
-      this.today = response.data.today;
-      this.tomorrow = response.data.tomorrow;
-      this.twoWeeks = response.data.twoWeeks;
-      this.month = response.data.month;
+      try {
+        let response = await axios.post(`/weather`);
+        this.data = response.data.data;
+        this.data.forEach((item) => {
+          const date = this.getDate(item.dt_txt);
 
-      let toDay = new Date();
-      this.monthDays = [];
-      this.cal = true;
-      for (let i = 0; i < 36; i++) {
-        let date = new Date(toDay);
-        date.setDate(toDay.getDate() + i);
-        this.monthDays.push(date.toISOString().slice(0, 10));
+          const existingDay = this.days.find((day) => day.date === date);
+
+          if (existingDay) {
+            existingDay.list.push(item);
+          } else {
+            this.days.push({
+              date,
+              list: [item],
+            });
+          }
+        });
+      } catch (err) {
+        console.log(err);
       }
-    },
-    show_day(s) {
-      let arr = s.split("-");
-      s = arr.reverse().join(".");
-      return s;
     },
     getDate(data) {
-      dayjs.locale("ru");
-      let date = new Date(data);
-      let day = dayjs(date);
-      return day.format(`dd, D MMM`);
-    },
-    dataWeather(s) {
-      this.target = s;
-      if (this.target == "сегодня") {
-        this.weather = this.today;
-      } else if (this.target == "завтра") {
-        this.weather = this.tomorrow;
-      } else if (this.target == "14-дней") {
-        this.weather = this.twoWeeks;
-      } else if (this.target == "месяц") {
-        this.weather = this.month;
+      try {
+        dayjs.locale("ru");
+        let date = new Date(data);
+        let day = dayjs(date);
+        return day.format(`dd, D MMM`);
+      } catch (err) {
+        console.log(err);
       }
-      console.log(this.weather);
     },
+    // dataWeather(s) {
+    //   this.target = s;
+    //   if (this.data.length > 0) {
+    //     if (this.target == "сегодня") {
+    //       this.loadWeather();
+    //     } else if (this.target == "завтра") {
+    //       this.loadWeather();
+    //     } else if (this.target == "14-дней") {
+    //       this.loadWeather();
+    //     } else if (this.target == "месяц") {
+    //       this.loadWeather();
+    //     }
+    //   }
+    // },
 
-    getsrc(s, t) {
+    getsrc(s) {
       if (s) {
         if (s.toLowerCase().includes("дожд")) {
           return "rainy.png";
@@ -82,9 +70,8 @@ export default {
         ) {
           return "snow.png";
         } else if (
-          (s.toLowerCase().includes("ясн") ||
-            s.toLowerCase().includes("безоблачно")) &&
-          (t == "8:00" || t == "11:00" || t == "14:00" || t == "17:00")
+          s.toLowerCase().includes("ясн") ||
+          s.toLowerCase().includes("безоблачно")
         ) {
           return "sun.png";
         } else if (s.toLowerCase().includes("тум")) {
@@ -94,11 +81,6 @@ export default {
           s.toLowerCase().includes("облачн")
         ) {
           return "cloudy.png";
-        } else if (
-          s.toLowerCase().includes("безоблачн") &&
-          (t == "2:00" || t == "5:00" || t == "20:00" || t == "23:00")
-        ) {
-          return "luna.png";
         }
       } else {
         return "no.png";
@@ -109,8 +91,39 @@ export default {
       let n1 = parseInt(tmin);
       let n2 = parseInt(tmax);
       let sum = n1 + n2;
-      console.log(tmin, n1, tmax, n2, sum);
       return Math.floor(sum / 2);
+    },
+
+    getHour(dateString) {
+      try {
+        // Разделяем дату и время
+        if (dateString) {
+          const [datePart, timePart] = dateString.split(" ");
+
+          // Создаем объект Date из части даты
+          const dateObj = new Date(datePart);
+
+          // Получаем текущее время с учетом времени из строки
+          const currentTime = new Date(
+            dateObj.getFullYear(),
+            dateObj.getMonth(),
+            dateObj.getDate(),
+            parseInt(timePart.split(":")[0]),
+            parseInt(timePart.split(":")[1].split(":")[0]),
+            0
+          );
+
+          // Форматируем время в "HH:mm"
+          const formattedTime =
+            currentTime.getHours().toString().padStart(2, "0") +
+            ":" +
+            currentTime.getMinutes().toString().padStart(2, "0");
+
+          return formattedTime;
+        }
+      } catch (err) {
+        console.log(err);
+      }
     },
   },
   mounted() {
@@ -121,17 +134,8 @@ export default {
 
 <template>
   <div class="weather-wrapper">
-    <div class="wrapper-input">
-      <input
-        @keyup.enter="loadWeather"
-        v-model="find"
-        type="text"
-        placeholder="Шерегеш"
-      />
-      <button @click="loadWeather" class="btn-find" type="submit">Поиск</button>
-    </div>
-    <span class="city">{{ !find ? "Шерегеш" : find }}</span>
-    <div class="wrapp">
+    <span class="city">Шерегеш</span>
+    <!-- <div class="wrapp">
       <button
         class="btn-weather"
         :class="{ active: this.target == 'сегодня' }"
@@ -148,40 +152,26 @@ export default {
       </button>
       <button
         class="btn-weather"
-        :class="{ active: this.target == '14-дней' }"
-        @click="dataWeather('14-дней')"
+        :class="{ active: this.target == '5-дней' }"
+        @click="dataWeather('5-дней')"
       >
-        14-дней
+        5-дней
       </button>
-      <button
-        class="btn-weather"
-        :class="{ active: this.target == 'месяц' }"
-        @click="dataWeather('месяц')"
-      >
-        Месяц
-      </button>
-    </div>
-    <div class="wrapper" v-if="weather.length < 14">
-      <div class="card-weather" v-for="(item, i) in weather" :key="i">
-        <span>{{ dayHours[i] }}</span>
-        <img
-          class="card-weather-img"
-          :src="'/src/assets/img/' + getsrc(item.summary, dayHours[i])"
-          alt=""
-        />
-        <span>{{ item.temp }}°</span>
-      </div>
-    </div>
-    <div class="wrapper" v-if="weather.length >= 14">
-      <div class="card-weather" v-for="(item, i) in weather" :key="i">
-        <span class="data">{{ getDate(monthDays[i]) }}</span>
-        <img
-          class="card-weather-img"
-          :src="'/src/assets/img/' + getsrc(item.summary, dayHours[i])"
-          alt=""
-        />
-        <span>Мин. °C: {{ item.tmin }}°</span>
-        <span>Макс. °C: {{ item.tmax }}°</span>
+    </div> -->
+    <div class="wrapper">
+      <div class="wrap-day" v-for="item in days" :key="item.date">
+        <div class="date">{{ item.date }}</div>
+        <div class="weather">
+          <div class="card-weather" v-for="day in item.list" :key="day.dt">
+            <span>{{ getHour(day.dt_txt) }}</span>
+            <img
+              class="card-weather-img"
+              :src="'./assets/' + getsrc(day.weather[0].description)"
+              alt=""
+            />
+            <span>{{ day.main.temp }}°</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -221,10 +211,9 @@ export default {
 .wrapper {
   width: 80%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
   gap: 20px;
-  flex-wrap: wrap;
   height: 50vh;
   overflow-x: hidden;
   overflow-y: scroll;
@@ -255,6 +244,11 @@ input {
 .city {
   color: #fff;
   font-size: 2rem;
+}
+
+.date {
+  color: #fff;
+  font-size: 1.2rem;
 }
 
 .wrapp {
@@ -294,6 +288,19 @@ input {
 
 .data {
   font-size: 1rem;
+}
+
+.wrap-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.weather {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 @media (max-width: 1000px) {

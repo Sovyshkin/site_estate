@@ -30,6 +30,7 @@ UserModel.init(
     balance: { type: DataTypes.INTEGER, allowNull: true },
     messengers: { type: DataTypes.JSON, allowNull: true },
     chatID: { type: DataTypes.STRING, allowNull: true },
+    paid: { type: DataTypes.JSON, allowNull: true },
   },
   { sequelize, modelName: "UserModel" }
 );

@@ -9,12 +9,13 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const path = require("path");
-const fs = require("fs");
+const fs = require("fs").promises;
+const { readFile } = require("fs").promises;
 const mkdirp = require("mkdirp");
 const nodemailer = require("nodemailer");
 
 const TelegramApi = require("node-telegram-bot-api");
-const tokenBot = "6512089922:AAEYdrW_8UsZ4OOfXSNLTqsRttt0xxL29cw";
+const tokenBot = "6512089922:AAFSuhZ4-Hh9y6aqP0sufkkYsV0WZNIYF-E";
 
 // let bot = false;
 
@@ -55,10 +56,18 @@ const { default: axios } = require("axios");
 const { SMSRu } = require("node-sms-ru");
 
 const sms = new SMSRu("F2117CBA-89E3-7C23-1C4F-61E1F9338C54");
-const { Gismeteo } = require("gismeteo");
+const tokenWeather = "43d1dd24e6e8440ed00a7e156e16a7a9";
+const { OpenWeatherAPI } = require("openweather-api-node");
+
+let weather = new OpenWeatherAPI({
+  key: tokenWeather,
+  locationName: "New York",
+  units: "imperial",
+});
+
 const dayjs = require("dayjs");
 
-const gismeteo = new Gismeteo({ lang: "ru", unit_temp: "C" });
+// const gismeteo = new Gismeteo({ lang: "ru", unit_temp: "C" });
 
 let app = express();
 let port = process.env.PORT || 3005;
@@ -73,7 +82,8 @@ app.use(cors());
 app.use(
   session({ secret: "secret-key", resave: false, saveUninitialized: true })
 );
-app.use((_req, res, next) => {
+app.use((req, res, next) => {
+  console.log(`Request: ${req.method} ${req.url}`);
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "*");
   next();
@@ -140,7 +150,8 @@ let ADMINVERIFY = function (roles) {
   };
 };
 
-app.use("/assets", express.static("dist/assets"));
+// Настройка middleware для обработки статических файлов
+app.use(express.static(path.join(__dirname, "dist/assets")));
 
 // фикс вылета на перезагрузке
 app.route("/*").get(function (req, res) {
@@ -149,7 +160,33 @@ app.route("/*").get(function (req, res) {
 app.get("/", async function (req, res) {
   res.sendFile(path.join(__dirname, "dist/index.html"));
 });
-//app.use(fallback(path.join(__dirname, 'dist/index.html')))
+
+const { CronJob } = require("cron");
+
+const job = new CronJob(
+  "* * 6 * * *", // cronTime
+  async function () {
+    try {
+      console.log("Запрос отправляется");
+      let tokenOpen = "8710460576eb8f2c7ab3af83310b746e";
+      let response = await axios.get(
+        `https://api.openweathermap.org/data/2.5/forecast?lat=52.940511&lon=87.917713&appid=${tokenOpen}&units=metric&lang=RU`
+      );
+      console.log(response.data);
+      const data = response.data.list;
+
+      const filePath = path.join(__dirname, "data.json");
+      await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+
+      console.log("Данные успешно сохранены в файл data.json");
+    } catch (error) {
+      console.error("Ошибка при выполнении запроса:", error.message);
+    }
+  }, // onTick
+  null, // onComplete
+  true, // start
+  "America/Los_Angeles" // timeZone
+);
 
 app.post(`/filter`, async function (req, res) {
   let { namefilter, cityfrom, cityto, datefrom, passenger } = req.body;
@@ -204,7 +241,8 @@ app.post(`/transfer`, async function (req, res) {
     }
     if (id && !book) {
       let transfer = await CardTransfer.findOne({ where: { id: id } });
-      res.send({ transfer, admin });
+      let reqs = await ReqBrone.findAll({ where: { cardID: id, done: false } });
+      res.send({ transfer, admin, countReqs: reqs.length });
       return;
     }
     let transfer = await CardTransfer.findAll({ where: { done: false } });
@@ -331,11 +369,11 @@ app.post(`/upload`, async function (req, res) {
         let filename = `img_${time}.jpg`;
         imgName.push(filename);
 
-        let mediaPath = path.join(__dirname, `public/assets/`);
+        let mediaPath = path.join(__dirname, `dist/assets/`);
         let imgPath = path.join(mediaPath, filename);
 
         // Создание директории, если она не существует
-        if (!fs.existsSync(mediaPath)) {
+        if (!fs.access(mediaPath)) {
           await mkdirp(mediaPath);
         }
 
@@ -359,7 +397,7 @@ app.post(`/upload`, async function (req, res) {
       let filename = `img_${time}.jpg`;
       imgName.push(filename);
 
-      let mediaPath = path.join(__dirname, `public/assets/`);
+      let mediaPath = path.join(__dirname, `dist/assets/`);
       let imgPath = path.join(mediaPath, filename);
 
       // Запись файла
@@ -430,7 +468,7 @@ app.post(`/upload_one`, async function (req, res) {
     let imgPath = path.join(mediaPath, filename);
 
     // Создание директории, если она не существует
-    if (!fs.existsSync(mediaPath)) {
+    if (!fs.access(mediaPath)) {
       await mkdirp(mediaPath);
     }
 
@@ -780,6 +818,7 @@ app.post(`/registration`, async function (req, res) {
       role: "USER",
       balance: 0,
       messengers: "[]",
+      paid: "[]",
     });
     console.log(newUser);
     await newUser.save();
@@ -832,7 +871,7 @@ app.post(`/deleteCard`, async function (req, res) {
 
 app.post(`/card`, async function (req, res) {
   try {
-    let { id, name, view } = req.body;
+    let { id, name, view, clientID } = req.body;
     let card;
     let number;
     console.log(id, name, view);
@@ -857,7 +896,19 @@ app.post(`/card`, async function (req, res) {
         where: { id: id, verified: true, done: false },
       });
     }
-    res.send({ card, number, view });
+    let reqs = [];
+    if (clientID == card.userID) {
+      reqs = await ReqBrone.findAll({ where: { cardID: id, done: false } });
+    }
+    let client = await UserModel.findOne({ where: { id: clientID } });
+    let paid = false;
+    if (client) {
+      if (client.paid) {
+        paid = client.paid.find((item) => item.name == name && item.id == id);
+      }
+      console.log(paid);
+    }
+    res.send({ card, number, view, countReqs: reqs.length, paid });
   } catch (err) {
     console.log(err);
   }
@@ -1647,17 +1698,54 @@ app.post(`/delete_skipass`, async function (req, res) {
 
 app.post(`/payment`, async function (req, res) {
   try {
-    let { price, name, id, userID } = req.body;
-    let transfer = await CardTransfer.findOne({ where: { id: id } });
+    let { price, name, id, userID, category } = req.body;
     let user = await UserModel.findOne({ where: { id: userID } });
-    let { paymentRef, payment } = await initPayment(price, name);
-    awaitPayment(payment).then(async (result) => {
-      if (result) {
-        console.log("Результат", result);
-        transfer.passenger -= 1;
-        await transfer.save();
-      }
-    });
+    if (category == "transfer") {
+      let transfer = await CardTransfer.findOne({ where: { id } });
+      let { paymentRef, payment } = await initPayment(price, name);
+      awaitPayment(payment).then(async (result) => {
+        if (result) {
+          console.log("Результат", result);
+          transfer.passenger -= 1;
+          user.paid.push({ id: transfer.id, category });
+          user.save();
+          await transfer.save();
+        }
+      });
+    } else if (category == "hotel") {
+      let hotel = await HotelModel.findOne({ where: { id } });
+      let { paymentRef, payment } = await initPayment(price, name);
+      awaitPayment(payment).then(async (result) => {
+        if (result) {
+          console.log("Результат", result);
+          user.paid.push({ id: hotel.id, category });
+          user.save();
+          await transfer.save();
+        }
+      });
+    } else if (category == "service") {
+      let service = await CardService.findOne({ where: { id } });
+      let { paymentRef, payment } = await initPayment(price, name);
+      awaitPayment(payment).then(async (result) => {
+        if (result) {
+          console.log("Результат", result);
+          user.paid.push({ id: service.id, category });
+          user.save();
+          await transfer.save();
+        }
+      });
+    } else {
+      let card = await CardModel.findOne({ where: { id } });
+      let { paymentRef, payment } = await initPayment(price, name);
+      awaitPayment(payment).then(async (result) => {
+        if (result) {
+          console.log("Результат", result);
+          user.paid.push({ id: card.id, category });
+          user.save();
+          await transfer.save();
+        }
+      });
+    }
 
     res.send({ paymentRef, success: true });
   } catch (err) {
@@ -1722,33 +1810,36 @@ app.post(`/send_brone`, async function (req, res) {
           `Водитель подтвердил ваше бронирование на https://sneg-info.ru/transfer/card?id=${cardID}&confirm=true, оплатите поездку в ближайшее время!`
         );
       }
-      let transporter = nodemailer.createTransport({
-        host: "smtp.beget.com",
-        port: 2525,
-        secure: false,
-        auth: {
-          user: "codered-it@coderedit.site",
-          pass: "Stas_2001",
-        },
-      });
+      if (email) {
 
-      let mailOptions = {
-        from: "<codered-it@coderedit.site>",
-        to: email,
-        subject: "Бронирование",
-        text: "Ваша бронь подтверждена",
-        html: `Водитель подтвердил ваше бронирование на https://sneg-info.ru/transfer/card?id=${cardID}&confirm=true, оплатите поездку в ближайшее время!`,
-      };
-
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          return console.log(error);
-        }
-        console.log("Message sent: %s", info.messageId);
-      });
+        let transporter = nodemailer.createTransport({
+          host: "smtp.beget.com",
+          port: 2525,
+          secure: false,
+          auth: {
+            user: "codered-it@coderedit.site",
+            pass: "Stas_2001",
+          },
+        });
+  
+        let mailOptions = {
+          from: "<codered-it@coderedit.site>",
+          to: email,
+          subject: "Бронирование",
+          text: "Ваша бронь подтверждена",
+          html: `Водитель подтвердил ваше бронирование на https://sneg-info.ru/transfer/card?id=${cardID}&confirm=true, оплатите поездку в ближайшее время!`,
+        };
+  
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            return console.log(error);
+          }
+          console.log("Message sent: %s", info.messageId);
+        });
+      }
     } else if (name == "habitation") {
       let card = await HotelModel.findOne({ where: { id: cardID } });
-      if (bot) {
+      if (bot && chatID) {
         bot.sendMessage(
           chatID,
           `Ваш запрос на бронирование принят https://sneg-info.ru/card?id=${cardID}&confirm=true&name=habitation оплатите бронирование в ближайшее время!`
@@ -2541,25 +2632,9 @@ app.post(`/reject_payments`, async function (req, res) {
 
 app.post(`/weather`, async function (req, res) {
   try {
-    let { city } = req.body;
-    let today, tomorrow, twoWeeks, month;
-
-    await gismeteo.getToday(city).then((data) => {
-      today = data;
-      res.send({ today });
-    });
-    // await gismeteo.getTomorrow(city).then((data) => {
-    //   console.log("Tomorrow", data);
-    //   tomorrow = data;
-    // });
-    // await gismeteo.getTwoWeeks(city).then((data) => {
-    //   twoWeeks = data;
-    // });
-    // await gismeteo.getMonth(city).then((data) => {
-    //   month = data;
-    // });
-
-    // res.send({ today, tomorrow, twoWeeks, month });
+    let data = await readFile("data.json", "utf8");
+    let jsonData = JSON.parse(data);
+    res.send({ data: jsonData });
   } catch (err) {
     console.log(err);
   }
@@ -2669,6 +2744,7 @@ app.post(`/request_brone`, async function (req, res) {
           await req.save();
           let user = await UserModel.findOne({ where: { id: card.userID } });
           if (bot) {
+            console.log("Телеграм бот");
             bot.sendMessage(
               user.chatID,
               `У вас новый запрос на бронирование https://sneg-info.ru/transfer/card?id=${cardID}, перейдите в "Запросы бронирования" и подтвердите запрос!`
@@ -2689,7 +2765,7 @@ app.post(`/request_brone`, async function (req, res) {
             to: card.email,
             subject: "Бронирование",
             text: "Новый запрос на бронь!",
-            html: `Ваше бронирование на https://sneg-info.ru/transfer/card?id=${cardID}, перейдите в "Запросы бронирования" и подтвердите запрос!`,
+            html: `У вас новый запрос на бронирование https://sneg-info.ru/transfer/card?id=${cardID}, перейдите в "Запросы бронирования" и подтвердите запрос!`,
           };
 
           transporter.sendMail(mailOptions, (error, info) => {
@@ -2753,6 +2829,38 @@ app.post(`/request_brone`, async function (req, res) {
           }
           card.calendar = JSON.stringify(cal);
           await card.save();
+          let user = await UserModel.findOne({ where: { id: card.userID } });
+          if (bot) {
+            console.log("Телеграм бот");
+            bot.sendMessage(
+              user.chatID,
+              `У вас новый запрос на бронирование https://sneg-info.ru/card?id=${cardID}&name=habitation&edit=true, перейдите в "Запросы бронирования" и подтвердите запрос!`
+            );
+          }
+          let transporter = nodemailer.createTransport({
+            host: "smtp.beget.com",
+            port: 2525,
+            secure: false,
+            auth: {
+              user: "codered-it@coderedit.site",
+              pass: "Stas_2001",
+            },
+          });
+
+          let mailOptions = {
+            from: "<codered-it@coderedit.site>",
+            to: card.email,
+            subject: "Бронирование",
+            text: "Новый запрос на бронь!",
+            html: `У вас новый запрос на бронирование https://sneg-info.ru/transfer/card?id=${cardID}&name=habitation&edit=true, перейдите в "Запросы бронирования" и подтвердите запрос!`,
+          };
+
+          transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+              return console.log(error);
+            }
+            console.log("Message sent: %s", info.messageId);
+          });
           res.send({
             status: 200,
             message: "Успешно, ожидайте подтверждения от хозяина объявления!",
@@ -2939,7 +3047,7 @@ app.post(`/set_price`, async function (req, res) {
     let card = await HotelModel.findOne({ where: { id } });
     let work = ["пн", "вт", "ср", "чт", "пт", "Mo", "Tu", "We", "Th", "Fr"];
     if (card) {
-      if (card.calendar) {
+      if (card.calendar && card.calendar != "[]") {
         let cal = JSON.parse(card.calendar);
         for (let i = 0; i < cal.length; i++) {
           let day = cal[i].date.slice(0, 2);

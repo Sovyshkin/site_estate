@@ -1,4 +1,5 @@
 <script>
+import axios from "axios";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
 import { defineComponent } from "vue";
@@ -7,6 +8,7 @@ import { Carousel, Slide } from "vue3-carousel";
 import "vue3-carousel/dist/carousel.css";
 export default defineComponent({
   props: {
+    id: String,
     name: String,
     cityfrom: String,
     cityto: String,
@@ -30,6 +32,7 @@ export default defineComponent({
   data() {
     return {
       passenger3: this.passenger / 2,
+      countReqs: 0,
     };
   },
   methods: {
@@ -39,8 +42,32 @@ export default defineComponent({
       dayjs.locale("ru");
       return day.format(`dd, D MMM`);
     },
+
+    async loadInfo() {
+      try {
+        let response = await axios.post(`/transfer`, {
+          id: this.id,
+        });
+        console.log(response);
+        this.countReqs = response.data.countReqs;
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    getImage(name) {
+      try {
+        return require(`/dist/assets/${name}`);
+      } catch (err) {
+        console.log(err);
+      }
+    },
   },
-  mounted() {},
+  async mounted() {
+    if (this.id) {
+      await this.loadInfo();
+    }
+  },
 });
 </script>
 
@@ -67,7 +94,7 @@ export default defineComponent({
           </div>
           <div class="second">
             <span>{{ cityto }}</span>
-            <div class="wrapsvg">
+            <!-- <div class="wrapsvg">
               <div
                 class="circlesvg"
                 :class="{
@@ -107,7 +134,7 @@ export default defineComponent({
               >
                 <ion-icon name="person"></ion-icon>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -116,7 +143,7 @@ export default defineComponent({
           <Carousel :autoplay="4000" :wrap-around="true">
             <Slide v-for="slide in img" :key="slide">
               <div class="carousel__item">
-                <img class="carousel_img" :src="`/assets/` + slide" alt="" />
+                <img class="carousel_img" :src="getImage(slide)" alt="" />
               </div>
             </Slide>
           </Carousel>
@@ -135,6 +162,7 @@ export default defineComponent({
       </div>
     </div>
     <div v-if="done" class="done">Снято с публикации</div>
+    <div class="alert" v-if="countReqs">{{ countReqs }}</div>
   </div>
 </template>
 
@@ -287,6 +315,7 @@ span:not(.sub, .cars span) {
 .red {
   background: #ee2e31;
 }
+
 @media (max-width: 1000px) {
   .cardTransfer {
     width: 70%;

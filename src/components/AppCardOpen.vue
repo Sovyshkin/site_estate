@@ -1,10 +1,10 @@
 <script>
+/* eslint-disable */
 import axios from "axios";
 import { defineComponent } from "vue";
 import dayjs from "dayjs";
 import "dayjs/locale/ru";
 import { Carousel, Navigation, Slide, Pagination } from "vue3-carousel";
-import * as ymaps from "ymaps";
 
 import "vue3-carousel/dist/carousel.css";
 
@@ -141,6 +141,8 @@ export default defineComponent({
         "Трансфер на гору",
         "",
       ],
+      countReqs: 0,
+      paid: false,
     };
   },
   mounted() {
@@ -204,16 +206,20 @@ export default defineComponent({
       } else {
         this.view = false;
       }
+      this.name = this.$route.query.name;
       let response = await axios.post(`/card`, {
         id: this.$route.query.id,
-        name: this.$route.query.name,
+        name: this.name,
         view: this.view,
+        clientID: this.id,
       });
+      this.paid = response.data.paid;
       this.INFO = response.data.card;
       this.address = response.data.card.address
         .replace(` `, `+`)
         .replace(`, `, `+`)
         .replace(` `, `+`);
+      this.countReqs = response.data.countReqs;
     },
     getDate(data) {
       let date = new Date(data);
@@ -459,7 +465,7 @@ export default defineComponent({
     goclone() {
       this.$router.push({
         name: "createCard",
-        query: { id: this.id, name: this.name },
+        query: { id: this.INFO.id, name: this.name },
       });
     },
 
@@ -513,6 +519,13 @@ export default defineComponent({
           name: "habitation",
         },
       });
+    },
+    getImage(name) {
+      try {
+        return require(`/dist/assets/${name}`);
+      } catch (err) {
+        console.log(err);
+      }
     },
   },
 });
@@ -1085,8 +1098,8 @@ export default defineComponent({
         <div class="img">
           <Carousel :autoplay="4000" :wrap-around="true">
             <Slide v-for="slide in INFO.img" :key="slide">
-              <div class="carousel__item">
-                <img :src="`/assets/` + slide" alt="" />
+              <div class="carousel__item" v-if="slide">
+                <img :src="getImage(slide)" alt="" />
               </div>
             </Slide>
 
@@ -1101,7 +1114,12 @@ export default defineComponent({
             <span class="title" v-if="INFO.title">{{ INFO.title }}</span>
             <span class="price" v-if="INFO.price">{{ INFO.price }} руб</span>
           </div>
-          <div class="group" v-for="(item, ind) in namebronyMain" :key="ind">
+          <div
+            class="group"
+            v-for="(item, ind) in namebronyMain"
+            :key="ind"
+            v-if="INFO[ind]"
+          >
             <span> {{ item }}: </span>
             <span>
               {{ INFO[ind] }}
@@ -1110,9 +1128,15 @@ export default defineComponent({
           <span class="address">{{ INFO.address }}</span>
           <span class="phone">{{ INFO.phone }}</span>
           <span class="description">{{ INFO.p }}</span>
-          <div class="messengers">
+          <div class="messengers" v-if="paid">
             <a :href="'https://t.me/' + INFO.phone" target="_blank">
-              <img src="/src/assets/img/telegram.png" alt="telegram" />
+              <img src="assets/telegram.png" alt="telegram" />
+            </a>
+            <a :href="'viber://chat?number=%2B' + INFO.phone" target="_blank">
+              <img src="assets/viber.png" alt="telegram" />
+            </a>
+            <a :href="'https://wa.me/' + INFO.phone" target="_blank">
+              <img src="assets/whatsapp.png" alt="telegram" />
             </a>
           </div>
         </div>
@@ -1204,8 +1228,9 @@ export default defineComponent({
       </div>
       <div class="reviews"></div>
       <div class="button-wrapper" v-if="!view">
-        <button v-if="edit" @click="goBooking" class="btn btn-secondary">
+        <button v-if="edit" @click="goBooking" class="btn btn-secondary reqs">
           Запросы бронирования
+          <div class="alert" v-if="countReqs">{{ countReqs }}</div>
         </button>
         <button v-if="edit" @click="goclone" class="btn btn-info">
           Клонировать объявление
@@ -1213,7 +1238,7 @@ export default defineComponent({
         <button @click="goEdit" class="btn btn-light" v-if="edit">
           Редактировать
         </button>
-        <button v-if="!admin && id" class="btn btn-brone" @click="goBrone">
+        <button v-if="!admin && id" class="btn btn-brone" @click="goCalendar">
           Забронировать
         </button>
         <button
@@ -1679,9 +1704,8 @@ img {
 
 .messengers {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
 }
 .messengers a {
   width: auto;
@@ -1698,6 +1722,10 @@ img {
 
 .address {
   font-size: 1rem !important;
+}
+
+.reqs {
+  position: relative;
 }
 
 @media (max-width: 660px) {

@@ -101,17 +101,7 @@ export default {
 
 <template>
   <div class="wrapper">
-    <div
-      class="wrapper-for-item"
-      @click="
-        $router.push({
-          path: `/transfer/card`,
-          query: { id: item.id, view: true },
-        })
-      "
-      v-for="item in requests"
-      :key="item"
-    >
+    <div class="wrapper-for-item" v-for="item in requests" :key="item">
       <div class="info">
         <div class="title">
           <span>Имя клиента: </span>

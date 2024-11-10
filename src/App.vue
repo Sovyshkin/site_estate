@@ -159,7 +159,7 @@ export default {
     <span @click="go_back">
       <img
         class="arrow left_arrow"
-        src="assets/arrow-down-sign-to-navigate.png"
+        src="/assets/arrow-down-sign-to-navigate.png"
         alt=""
       />
     </span>
@@ -167,7 +167,7 @@ export default {
     <span @click="go_up">
       <img
         class="arrow right_arrow"
-        src="assets/arrow-down-sign-to-navigate.png"
+        src="/assets/arrow-down-sign-to-navigate.png"
         alt=""
       />
     </span>
@@ -272,7 +272,8 @@ button:hover {
 }
 
 .arrow {
-  width: 30px;
+  width: 30px !important;
+  height: 30px !important;
 }
 
 .arrow:hover,
@@ -312,18 +313,18 @@ button:hover {
 }
 .alert {
   position: absolute;
-  top: 5%;
-  right: 3%;
+  top: -10px;
+  right: -17px;
   padding: 2px;
-  color: red;
-  border: 1px solid red;
+  background-color: #ed1c24;
   border-radius: 100%;
   height: 25px;
   width: 25px;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 2;
+  color: #fff;
+  font-weight: 550;
 }
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -342,7 +343,7 @@ input:-webkit-autofill:active {
   padding: 5px 12px;
   background-color: #f7ede8;
   border-radius: 12px;
-  color: #ee2e31;
+  color: #ee2e31 !important;
 }
 
 .wrapperBottom {
