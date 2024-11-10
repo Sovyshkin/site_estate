@@ -522,7 +522,7 @@ export default defineComponent({
     },
     getImage(name) {
       try {
-        return require(`./assets/${name}`);
+        return require(`./dist/assets/${name}`);
       } catch (err) {
         console.log(err);
       }
