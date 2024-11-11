@@ -1811,7 +1811,6 @@ app.post(`/send_brone`, async function (req, res) {
         );
       }
       if (email) {
-
         let transporter = nodemailer.createTransport({
           host: "smtp.beget.com",
           port: 2525,
@@ -1821,7 +1820,7 @@ app.post(`/send_brone`, async function (req, res) {
             pass: "Stas_2001",
           },
         });
-  
+
         let mailOptions = {
           from: "<codered-it@coderedit.site>",
           to: email,
@@ -1829,7 +1828,7 @@ app.post(`/send_brone`, async function (req, res) {
           text: "Ваша бронь подтверждена",
           html: `Водитель подтвердил ваше бронирование на https://sneg-info.ru/transfer/card?id=${cardID}&confirm=true, оплатите поездку в ближайшее время!`,
         };
-  
+
         transporter.sendMail(mailOptions, (error, info) => {
           if (error) {
             return console.log(error);
