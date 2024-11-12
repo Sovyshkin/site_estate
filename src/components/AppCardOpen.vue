@@ -1099,9 +1099,9 @@ export default defineComponent({
           <Carousel :autoplay="4000" :wrap-around="true">
             <Slide v-for="slide in INFO.img" :key="slide">
               <div class="carousel__item" v-if="slide">
-                <img :src="getImage(slide)" alt="" />
-              </div>
-            </Slide>
+                <img :src="`https://sneg-info.ru:3005/${slide}`" alt="" />
+              </div> </Slide
+            >`
 
             <template #addons>
               <Navigation />

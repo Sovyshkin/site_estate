@@ -15,7 +15,7 @@ const mkdirp = require("mkdirp");
 const nodemailer = require("nodemailer");
 
 const TelegramApi = require("node-telegram-bot-api");
-const tokenBot = "6512089922:AAFSuhZ4-Hh9y6aqP0sufkkYsV0WZNIYF-E";
+const tokenBot = "6512089922:AAF9OCB8ZUic7TYzxIdmdkkblieWSXx0RI8";
 
 // let bot = false;
 
@@ -83,7 +83,6 @@ app.use(
   session({ secret: "secret-key", resave: false, saveUninitialized: true })
 );
 app.use((req, res, next) => {
-  console.log(`Request: ${req.method} ${req.url}`);
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "*");
   next();
@@ -150,8 +149,7 @@ let ADMINVERIFY = function (roles) {
   };
 };
 
-// Настройка middleware для обработки статических файлов
-app.use(express.static(path.join(__dirname, "dist/assets")));
+app.use(express.static("dist/assets"));
 
 // фикс вылета на перезагрузке
 app.route("/*").get(function (req, res) {
@@ -164,7 +162,7 @@ app.get("/", async function (req, res) {
 const { CronJob } = require("cron");
 
 const job = new CronJob(
-  "* * 6 * * *", // cronTime
+  "0 */6 * * *", // cronTime
   async function () {
     try {
       console.log("Запрос отправляется");
@@ -3355,3 +3353,25 @@ app.post(`/cancel_brone`, async function (req, res) {
     console.log(err);
   }
 });
+
+// app.get("/images/get", async (req, res) => {
+//   try {
+//     const filename = req.query.filename;
+//     console.log(`Получен запрос для файла: ${filename}`);
+
+//     const imagePath = path.join(__dirname, "assets", filename);
+//     console.log(`Путь к файлу: ${imagePath}`);
+
+//     if (!fs.existsSync(imagePath)) {
+//       console.error(`Файл не найден: ${imagePath}`);
+//       return res.status(404).json({ message: "Изображение не найдено" });
+//     }
+
+//     const imageData = await fs.readFile(imagePath);
+//     res.setHeader("Content-Type", "image/jpeg"); // Установите правильный MIME тип
+//     res.send(imageData);
+//   } catch (error) {
+//     console.error("Ошибка при получении изображения:", error);
+//     res.status(500).json({ message: "Внутренняя ошибка сервера" });
+//   }
+// });
