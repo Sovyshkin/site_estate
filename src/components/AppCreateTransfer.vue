@@ -559,7 +559,7 @@ export default defineComponent({
             />
             <label for="file">
               <div class="line">
-                <img src="../assets/img/img_add.png" alt="" />
+                <img src="../assets/img_add.png" alt="" />
               </div>
             </label>
 

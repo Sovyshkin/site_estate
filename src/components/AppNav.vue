@@ -57,31 +57,31 @@ export default {
     <div class="navbar">
       <li class="list-item">
         <router-link to="/">
-          <img class="logo" src="../assets/img/logo.png" alt="" />
+          <img class="logo" src="../assets/logo.png" alt="" />
           <span class="list-item-name">Главная</span>
         </router-link>
       </li>
       <li class="list-item">
         <router-link to="/transfer">
-          <img class="car" src="../assets/img/bus.png" alt="" />
+          <img class="car" src="../assets/bus.png" alt="" />
           <span class="list-item-name">Забронировать трансфер</span>
         </router-link>
       </li>
       <li class="list-item">
         <router-link to="/habitation">
-          <img class="bed" src="../assets/img/bed.png" alt="" />
+          <img class="bed" src="../assets/bed.png" alt="" />
           <span class="list-item-name">Забронировать место</span>
         </router-link>
       </li>
       <li @custom-event="request" class="list-item" v-if="!id">
         <RouterLink to="/register">
-          <img class="icon" src="../assets/img/register.png" alt="" />
+          <img class="icon" src="../assets/register.png" alt="" />
           <span class="list-item-name">Регистрация</span>
         </RouterLink>
       </li>
       <li @custom-event="request" class="list-item" v-if="id">
         <RouterLink to="/profile">
-          <img class="icon" src="../assets/img/profile.png" alt="" />
+          <img class="icon" src="../assets/profile.png" alt="" />
           <span class="list-item-name">Профиль</span>
         </RouterLink>
       </li>

@@ -136,14 +136,14 @@ export default {
         <img
           v-if="passType == 'text'"
           class="show"
-          src="@/assets/img/show.png"
+          src="@/assets/show.png"
           alt=""
           @click="this.passType = 'password'"
         />
         <img
           v-if="passType == 'password'"
           class="show"
-          src="@/assets/img/hidden.png"
+          src="@/assets/hidden.png"
           alt=""
           @click="this.passType = 'text'"
         />

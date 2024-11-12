@@ -106,7 +106,7 @@ export default {
         </div>
       </div>
       <div v-if="skipass.length == 0 || !skipass" class="empty">
-        <img src="../../assets/img/empty.png" alt="" /><span>Пусто...</span>
+        <img src="../../assets/empty.png" alt="" /><span>Пусто...</span>
       </div>
     </div>
   </div>
@@ -221,12 +221,12 @@ a:hover {
 }
 
 .accordion-button::after {
-  background-image: url("/src/assets/img/arrow-down-sign-to-navigate.png");
+  background-image: url("/src/assets/arrow-down-sign-to-navigate.png");
   transform: rotate(0);
 }
 
 .accordion-button:not(.collapsed)::after {
-  background-image: url("/src/assets/img/arrow-down-sign-to-navigate.png");
+  background-image: url("/src/assets/arrow-down-sign-to-navigate.png");
   transform: rotate(-180deg);
 }
 

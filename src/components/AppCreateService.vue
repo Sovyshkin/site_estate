@@ -207,7 +207,7 @@ export default defineComponent({
           v-on:change="handleFilesUpload"
         />
         <label for="file">
-          <div class="line"><img src="../assets/img/img_add.png" alt="" /></div>
+          <div class="line"><img src="../assets/img_add.png" alt="" /></div>
         </label>
 
         <Carousel v-if="files != ``" :autoplay="4000" :wrap-around="true">

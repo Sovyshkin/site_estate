@@ -18,7 +18,7 @@ export default {
 <template>
   <div class="list-item">
     <router-link to="/admin/sections">
-      <img class="icon" src="../assets/img/letter.png" alt="" />
+      <img class="icon" src="../assets/letter.png" alt="" />
       <span class="list-item-name">Запросы</span>
     </router-link>
     <div class="alert" v-if="notifs">{{ notifs }}</div>

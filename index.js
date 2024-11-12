@@ -70,7 +70,7 @@ const dayjs = require("dayjs");
 // const gismeteo = new Gismeteo({ lang: "ru", unit_temp: "C" });
 
 let app = express();
-let port = process.env.PORT || 3005;
+let port = 3000;
 
 app.listen(port, function () {
   console.log(`http://localhost:${port}`);

@@ -12,7 +12,7 @@ export default {
 <template>
   <div class="list-item">
     <router-link to="/emergency">
-      <img class="icon" src="../assets/img/911.png" alt="" />
+      <img class="icon" src="../assets/911.png" alt="" />
       <span class="list-item-name">Экстренная служба</span>
     </router-link>
   </div>

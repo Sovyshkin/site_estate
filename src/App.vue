@@ -159,7 +159,7 @@ export default {
     <span @click="go_back">
       <img
         class="arrow left_arrow"
-        src="/assets/arrow-down-sign-to-navigate.png"
+        src="./assets/arrow-down-sign-to-navigate.png"
         alt=""
       />
     </span>
@@ -167,7 +167,7 @@ export default {
     <span @click="go_up">
       <img
         class="arrow right_arrow"
-        src="/assets/arrow-down-sign-to-navigate.png"
+        src="./assets/arrow-down-sign-to-navigate.png"
         alt=""
       />
     </span>

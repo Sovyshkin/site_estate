@@ -70,7 +70,7 @@ export default {
         </div>
       </div>
       <div v-if="info.length == 0 || !info" class="empty">
-        <img src="../../assets/img/empty.png" alt="" /><span>Пусто...</span>
+        <img src="../../assets/empty.png" alt="" /><span>Пусто...</span>
       </div>
     </div>
   </div>

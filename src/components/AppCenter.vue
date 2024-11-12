@@ -17,7 +17,7 @@ export default {
   <div class="wrapper-main">
     <div class="container">
       <button class="webBack" @click="click_go">
-        <img src="/assets/arrow-down-sign-to-navigate.png" alt="" />
+        <img src="../assets/arrow-down-sign-to-navigate.png" alt="" />
       </button>
       <RouterView />
     </div>
@@ -71,10 +71,10 @@ export default {
   border: none;
 }
 .accordion-button:not(.collapsed)::after {
-  background-image: url("../assets/img/arrow-down-sign-to-navigate.png");
+  background-image: url("../assets/arrow-down-sign-to-navigate.png");
 }
 .accordion-button::after {
-  background-image: url("../assets/img/arrow-down-sign-to-navigate.png");
+  background-image: url("../assets/arrow-down-sign-to-navigate.png");
 }
 img {
   width: auto;

@@ -83,7 +83,7 @@ export default {
       </div>
       <div class="telegramBot" v-if="messenger == 'Telegram'">
         <a href="https://t.me/SNEGINFO_BOT" target="_blank">
-          <img class="teleg" src="../assets/img/telegram.png" alt="" />
+          <img class="teleg" src="../assets/telegram.png" alt="" />
           <span class="text"
             >Чтобы получать уведомления по вашему объявлению, перейдите в
             телеграм, нажав на иконку и напишите "/start", получите чат ID</span

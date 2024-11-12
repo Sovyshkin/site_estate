@@ -100,7 +100,7 @@ export default {
       </div>
     </div>
     <div v-if="LIFTS.length == 0 || !LIFTS" class="empty">
-      <img src="../../assets/img/empty.png" alt="" /><span>Пусто...</span>
+      <img src="../../assets/empty.png" alt="" /><span>Пусто...</span>
     </div>
   </div>
 </template>

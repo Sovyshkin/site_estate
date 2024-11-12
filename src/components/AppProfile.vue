@@ -184,37 +184,37 @@ export default {
         <div class="messengers">
           <img
             @click="bindms('Telegram')"
-            src="../assets/img/telegram.png"
+            src="../assets/telegram.png"
             alt="telegram"
             v-if="telegram"
           />
           <img
             @click="open('Telegram')"
-            src="../assets/img/telegram.png"
+            src="../assets/telegram.png"
             alt="telegram"
             v-if="!telegram"
           />
           <img
             @click="bindms('Viber')"
-            src="../assets/img/viber.png"
+            src="../assets/viber.png"
             alt="viber"
             v-if="viber"
           />
           <img
             @click="open('Viber')"
-            src="../assets/img/viber.png"
+            src="../assets/viber.png"
             alt="viber"
             v-if="!viber"
           />
           <img
             @click="bindms('Whatsapp')"
-            src="../assets/img/whatsapp.png"
+            src="../assets/whatsapp.png"
             alt=""
             v-if="whatsapp"
           />
           <img
             @click="open('Whatsapp')"
-            src="../assets/img/whatsapp.png"
+            src="../assets/whatsapp.png"
             alt=""
             v-if="!whatsapp"
           />

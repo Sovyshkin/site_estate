@@ -151,12 +151,12 @@ export default {
 }
 
 .accordion-button::after {
-  background-image: url("/src/assets/img/arrow-down-sign-to-navigate.png");
+  background-image: url("/src/assets/arrow-down-sign-to-navigate.png");
   transform: rotate(0);
 }
 
 .accordion-button:not(.collapsed)::after {
-  background-image: url("/src/assets/img/arrow-down-sign-to-navigate.png");
+  background-image: url("/src/assets/arrow-down-sign-to-navigate.png");
   transform: rotate(-180deg);
 }
 

@@ -614,7 +614,7 @@ export default {
       </div>
     </div>
     <div v-if="INFO.length == 0 || !INFO" class="empty">
-      <img src="../../assets/img/empty.png" alt="" /><span>Пусто...</span>
+      <img src="../../assets/empty.png" alt="" /><span>Пусто...</span>
     </div>
   </div>
 </template>

@@ -728,7 +728,7 @@ export default defineComponent({
           v-on:change="handleFilesUpload"
         />
         <label for="file">
-          <div class="line"><img src="../assets/img/img_add.png" alt="" /></div>
+          <div class="line"><img src="../assets/img_add.png" alt="" /></div>
         </label>
 
         <Carousel v-if="files != ``" :autoplay="4000" :wrap-around="true">
@@ -799,11 +799,7 @@ export default defineComponent({
         <button v-if="!edit" class="publish" @click="submitFiles">
           Опубликовать
         </button>
-        <button
-          v-if="category == 'habitation' || edit"
-          class="btn btn-info"
-          @click="this.createn = 1"
-        >
+        <button class="btn btn-info" @click="this.createn = 1">
           Полная информация
         </button>
         <button v-if="edit" class="publish" @click="editCard">Сохранить</button>

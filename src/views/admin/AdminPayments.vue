@@ -142,7 +142,7 @@ export default {
       </div>
     </transition>
     <div v-if="requests.length == 0 || !requests" class="empty">
-      <img src="../../assets/img/search.png" alt="" /><span>Пусто</span>
+      <img src="../../assets/search.png" alt="" /><span>Пусто</span>
     </div>
   </div>
   <div v-if="message" class="notification-container">

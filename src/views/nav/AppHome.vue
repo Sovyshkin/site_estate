@@ -21,7 +21,7 @@ export default {
       <RouterLink to="/info">
         <div class="event">
           Информация
-          <img src="../../assets/img/event_info.avif" alt="" />
+          <img src="../../assets/event_info.avif" alt="" />
         </div>
       </RouterLink>
     </li>
@@ -29,7 +29,7 @@ export default {
       <RouterLink to="/transfer-taksi">
         <div class="event transfer">
           Трансфер/Такси
-          <img src="../../assets/img/event_transfer.jpeg" alt="" />
+          <img src="../../assets/event_transfer.jpeg" alt="" />
         </div>
       </RouterLink>
     </li>
@@ -45,7 +45,7 @@ export default {
       <RouterLink to="/rental">
         <div class="event">
           Прокат
-          <img src="../../assets/img/event_rental.jpeg" alt="" />
+          <img src="../../assets/event_rental.jpeg" alt="" />
         </div>
       </RouterLink>
     </li>
@@ -53,7 +53,7 @@ export default {
       <RouterLink to="/forChildren">
         <div class="event transfer">
           Детям
-          <img src="../../assets/img/event_children.jpeg" alt="" />
+          <img src="../../assets/event_children.jpeg" alt="" />
         </div>
       </RouterLink>
     </li>
@@ -61,7 +61,7 @@ export default {
       <RouterLink to="/instructor-tours">
         <div class="event">
           Инструктор/Туры
-          <img src="../../assets/img/event_instructor.jpeg" alt="" />
+          <img src="../../assets/event_instructor.jpeg" alt="" />
         </div>
       </RouterLink>
     </li>
@@ -69,7 +69,7 @@ export default {
       <RouterLink to="/events">
         <div class="event">
           Развлечения
-          <img src="../../assets/img/event_events.jpg" alt="" />
+          <img src="../../assets/event_events.jpg" alt="" />
         </div>
       </RouterLink>
     </li>
@@ -77,7 +77,7 @@ export default {
       <RouterLink to="/news">
         <div class="event transfer">
           Новости
-          <img src="../../assets/img/event_news.jpeg" alt="" />
+          <img src="../../assets/event_news.jpeg" alt="" />
         </div>
       </RouterLink>
     </li>
@@ -85,7 +85,7 @@ export default {
       <RouterLink to="/ads">
         <div class="event">
           Объявления
-          <img src="../../assets/img/event_ads.jpeg" alt="" />
+          <img src="../../assets/event_ads.jpeg" alt="" />
         </div>
       </RouterLink>
     </li>

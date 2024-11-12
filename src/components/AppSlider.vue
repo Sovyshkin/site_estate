@@ -41,55 +41,55 @@ export default {
     <div class="navbar">
       <li class="list-item">
         <router-link to="/info" @click="hide">
-          <img class="icon" src="../assets/img/info.png" alt="" />
+          <img class="icon" src="../assets/info.png" alt="" />
           <span class="list-item-name">Инфо</span>
         </router-link>
       </li>
       <li class="list-item" @click="hide">
         <router-link to="/transfer">
-          <img class="bed" src="../assets/img/bus.png" alt="" />
+          <img class="bed" src="../assets/bus.png" alt="" />
           <span class="list-item-name">Трансфер/Такси</span>
         </router-link>
       </li>
       <li class="list-item" @click="hide">
         <router-link to="/habitation">
-          <img class="bed" src="../assets/img/bed.png" alt="" />
+          <img class="bed" src="../assets/bed.png" alt="" />
           <span class="list-item-name">Проживание</span>
         </router-link>
       </li>
       <li class="list-item" @click="hide">
         <router-link to="/rental">
-          <img class="bed" src="../assets/img/rent.png" alt="" />
+          <img class="bed" src="../assets/rent.png" alt="" />
           <span class="list-item-name">Прокат</span>
         </router-link>
       </li>
       <li class="list-item" @click="hide">
         <router-link to="/events">
-          <img class="bed" src="../assets/img/events.png" alt="" />
+          <img class="bed" src="../assets/events.png" alt="" />
           <span class="list-item-name">Развлечения</span>
         </router-link>
       </li>
       <li class="list-item" @click="hide">
         <router-link to="/forChildren">
-          <img class="bed" src="../assets/img/children.png" alt="" />
+          <img class="bed" src="../assets/children.png" alt="" />
           <span class="list-item-name">Детям</span>
         </router-link>
       </li>
       <li class="list-item" @click="hide">
         <router-link to="/instructor-tours">
-          <img class="bed" src="../assets/img/instructor.png" alt="" />
+          <img class="bed" src="../assets/instructor.png" alt="" />
           <span class="list-item-name">Инструктор/Туры</span>
         </router-link>
       </li>
       <li class="list-item" @click="hide">
         <router-link to="/news">
-          <img class="bed" src="../assets/img/news.png" alt="" />
+          <img class="bed" src="../assets/news.png" alt="" />
           <span class="list-item-name">Новости</span>
         </router-link>
       </li>
       <li class="list-item" @click="hide">
         <router-link to="/ads">
-          <img class="bed" src="../assets/img/ads.png" alt="" />
+          <img class="bed" src="../assets/ads.png" alt="" />
           <span class="list-item-name">Объявления</span>
         </router-link>
       </li>

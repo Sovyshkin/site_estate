@@ -569,7 +569,7 @@ export default defineComponent({
             />
             <label for="file">
               <div class="line">
-                <img src="../assets/img/img_add.png" alt="" />
+                <img src="../assets/img_add.png" alt="" />
               </div>
             </label>
 
@@ -802,7 +802,7 @@ export default defineComponent({
 
           <div class="telegramBot">
             <a href="https://t.me/SNEGINFO_BOT" target="_blank">
-              <img class="teleg" src="../assets/img/telegram.png" alt="" />
+              <img class="teleg" src="../assets/telegram.png" alt="" />
               <span class="text"
                 >Чтобы получать уведомления по вашему трансферу, перейдите в
                 телеграм, нажав на иконку и напишите "/start", получите чат
