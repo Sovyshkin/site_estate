@@ -1099,7 +1099,7 @@ export default defineComponent({
           <Carousel :autoplay="4000" :wrap-around="true">
             <Slide v-for="slide in INFO.img" :key="slide">
               <div class="carousel__item" v-if="slide">
-                <img :src="`http://91.106.207.44:3000/${slide}`" alt="" />
+                <img :src="`http://sneginqd.beget.tech/assets/${slide}`" alt="" />
               </div> </Slide
             >`
 
