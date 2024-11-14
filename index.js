@@ -15,7 +15,7 @@ const mkdirp = require("mkdirp");
 const nodemailer = require("nodemailer");
 
 const TelegramApi = require("node-telegram-bot-api");
-const tokenBot = "6512089922:AAF9OCB8ZUic7TYzxIdmdkkblieWSXx0RI8";
+const tokenBot = "6512089922:AAGEknbYZq9I537Mh1lhGzjvhW5BuKnO8SY";
 
 // let bot = false;
 
@@ -70,14 +70,20 @@ const dayjs = require("dayjs");
 // const gismeteo = new Gismeteo({ lang: "ru", unit_temp: "C" });
 
 let app = express();
-let port = 3000;
+let port = 3005;
 
 app.listen(port, function () {
   console.log(`http://localhost:${port}`);
 });
 
-app.use(cors());
-
+var corsOptions = {
+  origin: "http://localhost:8080",
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 // Подключаем middleware для сессий
 app.use(
   session({ secret: "secret-key", resave: false, saveUninitialized: true })
