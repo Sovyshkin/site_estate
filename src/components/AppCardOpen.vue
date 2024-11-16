@@ -1238,7 +1238,7 @@ export default defineComponent({
         <button @click="goEdit" class="btn btn-light" v-if="edit">
           Редактировать
         </button>
-        <button v-if="!admin && id" class="btn btn-brone" @click="goCalendar">
+        <button v-if="id" class="btn btn-brone" @click="goCalendar">
           Забронировать
         </button>
         <button

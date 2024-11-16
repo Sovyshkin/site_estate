@@ -24,6 +24,8 @@ export default defineComponent({
     boardedPlaces: Number,
     passenger2: Number,
     done: Boolean,
+    userID: String,
+    status: String,
   },
   components: {
     Carousel,
@@ -61,6 +63,17 @@ export default defineComponent({
       } catch (err) {
         console.log(err);
       }
+    },
+    getCookieValue(name) {
+      const cookies = document.cookie.split("; ");
+      let res;
+      for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i];
+        if (cookie.slice(0, 2) == name) {
+          res = cookie.replace(name + "=", "");
+        }
+      }
+      return res;
     },
   },
   async mounted() {
@@ -143,7 +156,11 @@ export default defineComponent({
           <Carousel :autoplay="4000" :wrap-around="true">
             <Slide v-for="slide in img" :key="slide">
               <div class="carousel__item">
-                <img class="carousel_img" :src="getImage(slide)" alt="" />
+                <img
+                  class="carousel_img"
+                  :src="`http://sneginqd.beget.tech/${slide}`"
+                  alt=""
+                />
               </div>
             </Slide>
           </Carousel>
@@ -162,7 +179,19 @@ export default defineComponent({
       </div>
     </div>
     <div v-if="done" class="done">Снято с публикации</div>
-    <div class="alert" v-if="countReqs">{{ countReqs }}</div>
+    <div class="alert" v-if="countReqs && getCookieValue('id') == userID">
+      {{ countReqs }}
+    </div>
+    <div
+      class="done status"
+      v-if="status"
+      :class="{
+        gr: status == 'Ждет оплаты',
+        yel: status == 'Ждет подтверждения',
+      }"
+    >
+      {{ status }}
+    </div>
   </div>
 </template>
 

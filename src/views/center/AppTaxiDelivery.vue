@@ -80,19 +80,6 @@ export default {
 .wrapper-for-content {
   width: 100%;
 }
-.empty {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  font-size: 1.7rem;
-  color: #fff;
-  height: 60vh;
-}
-
-.empty img {
-  height: 70px;
-}
 
 .wrapper-for-content {
   width: 100%;

@@ -561,18 +561,6 @@ export default {
   text-align: center;
 }
 
-.empty {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  font-size: 1.7rem;
-  color: #fff;
-}
-
-.empty img {
-  height: 70px;
-}
 .cards {
   width: 80%;
   padding: 10px;
@@ -766,14 +754,6 @@ input::placeholder {
 
   .btn {
     padding: 2px;
-  }
-
-  .empty {
-    font-size: 1.5rem;
-  }
-
-  .empty img {
-    height: 50px;
   }
 }
 

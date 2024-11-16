@@ -1,12 +1,17 @@
 <script>
+/* eslint-disable */
 import { RouterLink } from "vue-router";
 import axios from "axios";
-import dayjs from "dayjs";
-import "dayjs/locale/ru";
+import AppTransferCard from "/src/components/AppTransferCard.vue";
+import AppService from "/src/components/AppService.vue";
+import AppCard from "/src/components/AppCard.vue";
 
 export default {
   components: {
     RouterLink,
+    AppCard,
+    AppService,
+    AppTransferCard,
   },
 
   data() {
@@ -17,7 +22,11 @@ export default {
       active: 3,
       message: "",
       status: 200,
-      info: [],
+      services: [],
+      hotels: [],
+      cards: [],
+      transfers: [],
+      total: 0,
     };
   },
   methods: {
@@ -26,7 +35,16 @@ export default {
       let response = await axios.post(`/myreq`, {
         id: this.id,
       });
-      this.info = response.data.info;
+      console.log(response);
+      this.services = response.data.services;
+      this.hotels = response.data.hotels;
+      this.cards = response.data.cards;
+      this.transfers = response.data.transfers;
+      this.total =
+        this.hotels.length +
+        this.cards.length +
+        this.transfers.length +
+        this.services.length;
     },
 
     getCookieValue(name) {
@@ -99,33 +117,86 @@ export default {
         ><span>Мои бронирования</span></router-link
       >
     </div>
-    <div class="wrapper-group">
-      <div class="wrapper-for-item" v-for="item in info" :key="item">
-        <div class="info">
-          <div class="name">
-            <span>Тип:</span>
-            <span v-if="item.name == 'habitation'">Проживание</span>
-            <span v-if="item.name == 'transfer'">Трансфер</span>
-          </div>
-          <div class="places">
-            <span>Количество мест: </span>
-            <span>{{ item.places }}</span>
-          </div>
-          <div class="date">
-            <span>Запрошено с </span>
-            <span>{{ getDate(item.createdAt) }}</span>
-          </div>
-        </div>
-        <div class="buttons">
-          <button
-            type="button"
-            class="btn btn-danger btn-delete"
-            @click="reject(item.id)"
-          >
-            Отменить
-          </button>
-        </div>
-      </div>
+    <div class="wrapper-card" v-if="total > 0">
+      <app-transfer-card
+        v-if="transfers"
+        @click="
+          $router.push({
+            path: `/transfer/card`,
+            query: { id: card.id, confirm: card.status == 'Ждет оплаты' },
+          })
+        "
+        v-for="(card, index) in transfers"
+        :key="index"
+        :i="index"
+        :id="card.id"
+        :name="card.name"
+        :cityfrom="card.cityfrom"
+        :cityto="card.cityto"
+        :datefrom="card.datefrom"
+        :timefrom="card.timefrom"
+        :length="card.length"
+        :typeCar="card.typeCar"
+        :car="card.car"
+        :img="card.img"
+        :passenger="card.passenger"
+        :passenger2="card.passenger / 2"
+        :price_sit="card.price_sit"
+        :price_salon="card.price_salon"
+        :boardedPlaces="card.boardedPlaces"
+        :done="card.done"
+        :userID="card.userID"
+        :status="card.status"
+      >
+        <!-- <div class="alert" v-if="check_brone(card.id, 'transfer')">1</div> -->
+      </app-transfer-card>
+      <AppService
+        v-if="services"
+        v-for="(cardInfo, index) in services"
+        :key="index"
+        :img="cardInfo.img"
+        :name="cardInfo.name"
+        :phone="cardInfo.phone"
+        :description="cardInfo.description"
+        :id="cardInfo.id"
+        :i="index"
+        :done="cardInfo.done"
+        :status="cardInfo.status"
+      />
+      <AppCard
+        v-for="(cardInfo, index) in cards"
+        :key="index"
+        v-if="cards"
+        :i="index"
+        :title="cardInfo.title"
+        :img="cardInfo.img"
+        :price="cardInfo.price"
+        :p="cardInfo.p"
+        :id="cardInfo.id"
+        :nameCard="cardInfo.category"
+        :edit="true"
+        :done="cardInfo.done"
+        :status="cardInfo.status"
+      />
+
+      <AppCard
+        v-for="(cardInfo, index) in hotels"
+        v-if="hotels"
+        :key="index"
+        :i="index"
+        :title="cardInfo.title"
+        :img="cardInfo.img"
+        :price="cardInfo.price"
+        :p="cardInfo.p"
+        :id="cardInfo.id"
+        :nameCard="cardInfo.category"
+        :edit="true"
+        :done="cardInfo.done"
+        :status="cardInfo.status"
+      />
+    </div>
+    <div v-if="total == 0" class="empty">
+      <img src="../assets/empty.png" alt="" /><span>Пусто...</span>
     </div>
   </div>
   <div v-if="message" class="notification-container">
@@ -354,6 +425,7 @@ input {
   justify-content: center;
   align-items: center;
   gap: 20px;
+  padding: 10px;
 }
 
 .card {

@@ -240,6 +240,7 @@ ReqBrone.init(
     name: { type: DataTypes.STRING, allowNull: true },
     places: { type: DataTypes.INTEGER, allowNull: true },
     brone: { type: DataTypes.JSON, allowNull: true },
+    status: { type: DataTypes.STRING, allowNull: true },
     actives: { type: DataTypes.JSON, allowNull: true },
   },
   { sequelize, modelName: "ReqBrone" }

@@ -356,6 +356,27 @@ input:-webkit-autofill:active {
   align-items: center;
   gap: 50px;
 }
+
+.empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-size: 1.7rem;
+  color: #fff;
+}
+
+.empty img {
+  height: 70px;
+}
+
+.gr {
+  color: #5cd166 !important;
+}
+
+.yel {
+  color: #ffcd57 !important;
+}
 @media (max-width: 400px) {
   .wrapperBottom {
     width: 90%;
@@ -407,4 +428,13 @@ input:-webkit-autofill:active {
 /* input{
   color: #ffffff !important; 
 } */
+@media (max-width: 480px) {
+  .empty {
+    font-size: 1.5rem;
+  }
+
+  .empty img {
+    height: 50px;
+  }
+}
 </style>

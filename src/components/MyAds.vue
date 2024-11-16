@@ -145,6 +145,7 @@ export default {
           :price_salon="card.price_salon"
           :boardedPlaces="card.boardedPlaces"
           :done="card.done"
+          :userID="card.userID"
         >
           <!-- <div class="alert" v-if="check_brone(card.id, 'transfer')">1</div> -->
         </app-transfer-card>
@@ -178,7 +179,7 @@ export default {
 
         <AppCard
           v-for="(cardInfo, index) in hotels"
-          v-if="cards"
+          v-if="hotels"
           :key="index"
           :i="index"
           :title="cardInfo.title"

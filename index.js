@@ -15,7 +15,7 @@ const mkdirp = require("mkdirp");
 const nodemailer = require("nodemailer");
 
 const TelegramApi = require("node-telegram-bot-api");
-const tokenBot = "6512089922:AAGEknbYZq9I537Mh1lhGzjvhW5BuKnO8SY";
+const tokenBot = "6512089922:AAHyiAuXAPofZZG_kx4e_YvE3wmkz-k4i6I";
 
 // let bot = false;
 
@@ -1704,9 +1704,9 @@ app.post(`/payment`, async function (req, res) {
   try {
     let { price, name, id, userID, category } = req.body;
     let user = await UserModel.findOne({ where: { id: userID } });
+    let { paymentRef, payment } = await initPayment(price, name);
     if (category == "transfer") {
       let transfer = await CardTransfer.findOne({ where: { id } });
-      let { paymentRef, payment } = await initPayment(price, name);
       awaitPayment(payment).then(async (result) => {
         if (result) {
           console.log("Результат", result);
@@ -1718,7 +1718,6 @@ app.post(`/payment`, async function (req, res) {
       });
     } else if (category == "hotel") {
       let hotel = await HotelModel.findOne({ where: { id } });
-      let { paymentRef, payment } = await initPayment(price, name);
       awaitPayment(payment).then(async (result) => {
         if (result) {
           console.log("Результат", result);
@@ -1729,7 +1728,6 @@ app.post(`/payment`, async function (req, res) {
       });
     } else if (category == "service") {
       let service = await CardService.findOne({ where: { id } });
-      let { paymentRef, payment } = await initPayment(price, name);
       awaitPayment(payment).then(async (result) => {
         if (result) {
           console.log("Результат", result);
@@ -1740,7 +1738,6 @@ app.post(`/payment`, async function (req, res) {
       });
     } else {
       let card = await CardModel.findOne({ where: { id } });
-      let { paymentRef, payment } = await initPayment(price, name);
       awaitPayment(payment).then(async (result) => {
         if (result) {
           console.log("Результат", result);
@@ -2743,6 +2740,7 @@ app.post(`/request_brone`, async function (req, res) {
             clientID: clientID,
             name: "transfer",
             done: false,
+            status: "Ждет подтверждения",
           });
           await req.save();
           let user = await UserModel.findOne({ where: { id: card.userID } });
@@ -2818,6 +2816,7 @@ app.post(`/request_brone`, async function (req, res) {
             clientID: clientID,
             name: "habitation",
             done: false,
+            status: "Ждет подтверждения",
           });
           await req.save();
           if (!card.calendar) {
@@ -2894,7 +2893,7 @@ app.post(`/accept_request_brone`, async function (req, res) {
     if (name == "transfer") {
       let request = await ReqBrone.findOne({ where: { id } });
       if (request) {
-        request.done = true;
+        request.status = "Ждет оплаты";
         let transfer = await CardTransfer.findOne({
           where: { id: request.cardID },
         });
@@ -2933,8 +2932,9 @@ app.post(`/accept_request_brone`, async function (req, res) {
               }
             }
             card.calendar = JSON.stringify(calendar);
+            request.status = "Ждет оплаты";
             await card.save();
-            request.destroy();
+            await request.save();
             res.send({
               status: 200,
               message:
@@ -2950,8 +2950,9 @@ app.post(`/accept_request_brone`, async function (req, res) {
               }
             }
             card.calendar = JSON.stringify(cal2);
+            request.status = "Ждет оплаты";
             await card.save();
-            request.destroy();
+            await request.save();
             res.send({
               status: 200,
               message:
@@ -2976,6 +2977,7 @@ app.post(`/reject_request_brone`, async function (req, res) {
     let card;
     if (request) {
       request.done = true;
+      request.status = "Отменен";
       let client = await UserModel.findOne({ where: { id: request.clientID } });
       await request.save();
       res.send({
@@ -3246,7 +3248,52 @@ app.post(`/myreq`, async function (req, res) {
       let info = await ReqBrone.findAll({
         where: { clientID: id, done: false },
       });
-      res.send({ info });
+      let cards = [];
+      let hotels = [];
+      let transfers = [];
+      let services = [];
+      for (let i = 0; i < info.length; i++) {
+        let item = info[i];
+        if (item.name == "habitation") {
+          let hotel = await HotelModel.findOne({
+            where: { id: item.cardID },
+          });
+          // console.log(hotel);
+          if (hotel) {
+            let obj = { ...hotel.dataValues };
+            obj.status = item.status;
+            hotels.push(obj);
+          }
+        } else if (item.name == "transfer") {
+          let transfer = await CardTransfer.findOne({
+            where: { id: item.cardID },
+          });
+          if (transfer) {
+            let obj = { ...transfer.dataValues };
+            obj.status = item.status;
+            transfers.push(obj);
+          }
+        } else if (item.name == "service") {
+          let service = await CardService.findOne({
+            where: { id: item.cardID },
+          });
+          if (service) {
+            let obj = { ...service.dataValues };
+            obj.status = item.status;
+            services.push(obj);
+          }
+        } else {
+          let card = await CardModel.findOne({
+            where: { id: item.cardID },
+          });
+          if (card) {
+            let obj = { ...card.dataValues };
+            obj.status = item.status;
+            cards.push(obj);
+          }
+        }
+      }
+      res.send({ transfers, cards, hotels, services });
     }
   } catch (err) {
     console.log(err);
@@ -3264,12 +3311,12 @@ app.post(`/cancel_brone`, async function (req, res) {
         if (brone.name == "habitation" && user) {
           let card = await HotelModel.findOne({ where: { id: brone.cardID } });
           if (card) {
-            // if (bot) {
-            //   bot.sendMessage(
-            //     user.chatID,
-            //     `Клиент отменил бронирование в одном из ваших объявлений по проживанию`
-            //   );
-            // }
+            if (bot) {
+              bot.sendMessage(
+                user.chatID,
+                `Клиент отменил бронирование в одном из ваших объявлений по проживанию`
+              );
+            }
             let transporter = nodemailer.createTransport({
               host: "smtp.beget.com",
               port: 2525,

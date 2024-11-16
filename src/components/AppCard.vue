@@ -14,6 +14,7 @@ export default {
     nameCard: String,
     fromMyAds: Boolean,
     done: Boolean,
+    status: String,
   },
   data() {
     return {
@@ -134,6 +135,16 @@ export default {
     </div>
     <div v-if="done" class="done">Снято с публикации</div>
     <div class="alert" v-if="countReqs">{{ countReqs }}</div>
+    <div
+      class="done status"
+      v-if="status"
+      :class="{
+        gr: status == 'Ждет оплаты',
+        yel: status == 'Ждет подтверждения',
+      }"
+    >
+      {{ status }}
+    </div>
   </div>
 </template>
 

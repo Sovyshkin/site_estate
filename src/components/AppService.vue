@@ -8,6 +8,7 @@ export default {
     id: Number,
     i: Number,
     done: Boolean,
+    status: String,
   },
   methods: {
     open() {
@@ -26,7 +27,7 @@ export default {
     <img
       class="card-img-top"
       @click="open"
-      :src="'/assets/' + Array.from(img)[0]"
+      :src="`http://sneginqd.beget.tech/${slide}`"
       alt=""
     />
     <div class="card-body">
@@ -62,6 +63,16 @@ export default {
       </div>
     </div>
     <div v-if="done" class="done">Снято с публикации</div>
+    <div
+      class="done status"
+      v-if="status"
+      :class="{
+        gr: status == 'Ждет оплаты',
+        yel: status == 'Ждет подтверждения',
+      }"
+    >
+      {{ status }}
+    </div>
   </div>
 </template>
 

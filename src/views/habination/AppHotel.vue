@@ -777,20 +777,6 @@ a {
 .excel {
   cursor: pointer;
 }
-
-.empty {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  font-size: 1.7rem;
-  color: #fff;
-  height: 55vh;
-}
-
-.empty img {
-  height: 70px;
-}
 .cross {
   border: 4px dotted var(--mainColor);
   min-height: 290px;

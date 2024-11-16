@@ -218,19 +218,6 @@ a {
   color: #fff;
   font-weight: 550;
 }
-
-.empty {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  font-size: 1.7rem;
-  color: #fff;
-}
-
-.empty img {
-  height: 70px;
-}
 .wrapper {
   width: 90%;
   height: 70vh;
