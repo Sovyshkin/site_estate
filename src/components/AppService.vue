@@ -25,11 +25,15 @@ export default {
 <template>
   <div class="card">
     <img
+      v-if="img.length > 0"
       class="card-img-top"
       @click="open"
-      :src="`http://sneginqd.beget.tech/${slide}`"
+      :src="`http://sneginqd.beget.tech/${Array.from(img)[0]}`"
       alt=""
     />
+    <div v-else class="wrap_img">
+      <img src="../assets/no_image.png" alt="" class="no_image" @click="open" />
+    </div>
     <div class="card-body">
       <h5 class="card-title">
         <span class="title">{{ name }}</span>

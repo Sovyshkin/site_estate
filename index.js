@@ -15,7 +15,7 @@ const mkdirp = require("mkdirp");
 const nodemailer = require("nodemailer");
 
 const TelegramApi = require("node-telegram-bot-api");
-const tokenBot = "6512089922:AAHyiAuXAPofZZG_kx4e_YvE3wmkz-k4i6I";
+const tokenBot = "6512089922:AAHLIKQKNVDzU7XBlqgGFkFcA2-W_E5-or0";
 
 // let bot = false;
 
@@ -610,7 +610,7 @@ app.post(`/create-card`, async function (req, res) {
       } else {
         try {
           let card = await HotelModel.build({
-            img: {},
+            img: [],
             category: category,
             subcategory: subcategory,
             title: title,
@@ -706,7 +706,7 @@ app.post(`/create-card`, async function (req, res) {
       try {
         console.log("building card...");
         let card = await CardModel.build({
-          img: {},
+          img: [],
           category: category,
           subcategory: subcategory,
           userID: userID,
@@ -858,16 +858,26 @@ app.post(`/login`, async function (req, res) {
 });
 app.post(`/deleteCard`, async function (req, res) {
   try {
-    let { id, name } = req.body;
+    let { id, name, real } = req.body;
     let card;
-    if (name == `habitation`) {
-      card = await HotelModel.findOne({ where: { id: id } });
+    if (real) {
+      if (name == `habitation`) {
+        card = await HotelModel.findOne({ where: { id: id } });
+      } else {
+        card = await CardModel.findOne({ where: { id: id } });
+      }
+      card.destroy();
+      res.send({ status: "200" });
     } else {
-      card = await CardModel.findOne({ where: { id: id } });
+      if (name == `habitation`) {
+        card = await HotelModel.findOne({ where: { id: id } });
+      } else {
+        card = await CardModel.findOne({ where: { id: id } });
+      }
+      card.done = true;
+      await card.save();
+      res.send({ status: "200" });
     }
-    card.done = true;
-    await card.save();
-    res.send({ status: "200" });
   } catch (e) {
     res.send({ message: "Ошибка" });
   }
@@ -878,31 +888,39 @@ app.post(`/card`, async function (req, res) {
     let { id, name, view, clientID } = req.body;
     let card;
     let number;
+    let reqs = [];
     console.log(id, name, view);
     if (name == `habitation`) {
       if (view) {
         card = await HotelModel.findOne({
-          where: { id: id, verified: false, done: false },
+          where: { id: id, verified: false },
         });
         number = await NumberModel.findAll({
           where: { HotelModelId: id, done: false },
         });
       } else {
         card = await HotelModel.findOne({
-          where: { id: id, done: false },
+          where: { id: id },
         });
         number = await NumberModel.findAll({
           where: { HotelModelId: id, done: false },
         });
       }
+      if (card) {
+        if (clientID == card.userID) {
+          reqs = await ReqBrone.findAll({ where: { cardID: id, done: false } });
+        }
+      }
     } else {
+      console.log("info", name, id);
       card = await CardModel.findOne({
-        where: { id: id, verified: true, done: false },
+        where: { id: id },
       });
-    }
-    let reqs = [];
-    if (clientID == card.userID) {
-      reqs = await ReqBrone.findAll({ where: { cardID: id, done: false } });
+      if (card) {
+        if (clientID == card.userID) {
+          reqs = await ReqBrone.findAll({ where: { cardID: id, done: false } });
+        }
+      }
     }
     let client = await UserModel.findOne({ where: { id: clientID } });
     let paid = false;
@@ -1029,6 +1047,7 @@ app.post(`/event`, async function (req, res) {
     }
 
     if (name) {
+      console.log("event Здесь", name, category);
       cards = await CardModel.findAll({
         where: {
           category: category,
@@ -1258,7 +1277,7 @@ app.post(`/create_transfer`, async function (req, res) {
           verified: false,
           point: point,
           boardedPlaces: 0,
-          img: {},
+          img: [],
           done: false,
         });
         console.log("saving card...");
@@ -1341,7 +1360,7 @@ app.post(`/create_service`, async function (req, res) {
     try {
       console.log("building card...");
       let card = await CardService.build({
-        img: {},
+        img: [],
         name: name,
         phone: phone,
         description: description,
@@ -1888,9 +1907,11 @@ app.post(`/admin_requests`, async function (req, res) {
     } else if (nameModel == "service") {
       requests = await CardService.findAll({ where: { verified: false } });
     } else {
+      console.log(category, nameModel);
       requests = await CardModel.findAll({
         where: { category: category, subcategory: nameModel, verified: false },
       });
+      console.log(requests);
     }
     res.send({ requests });
   } catch (err) {
@@ -2069,7 +2090,7 @@ app.post(`/notifications`, async function (req, res) {
       }
 
       let events = await CardModel.findAll({
-        where: { category: "event", verified: false },
+        where: { category: "events", verified: false },
       });
       if (events) {
         events = events.length;
@@ -2165,7 +2186,7 @@ app.post(`/notifications`, async function (req, res) {
       }
 
       return res.send({ childrenRooms, nanny, otherEntertainment, instructor });
-    } else if (nameModel == "event") {
+    } else if (nameModel == "events") {
       let bans = await CardModel.findAll({
         where: { subcategory: "bans", verified: false },
       });

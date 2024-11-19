@@ -180,6 +180,15 @@ export default {
 </template>
 
 <style>
+body {
+  background-image: url("@/assets/bg.jpg");
+  width: 100%;
+  height: 100vh;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 @keyframes gradient {
   0% {
     background-position: 0, 50%;
@@ -358,6 +367,7 @@ input:-webkit-autofill:active {
 }
 
 .empty {
+  height: 30vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -376,6 +386,20 @@ input:-webkit-autofill:active {
 
 .yel {
   color: #ffcd57 !important;
+}
+
+.wrap_img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+}
+
+.no_image {
+  width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
 }
 @media (max-width: 400px) {
   .wrapperBottom {

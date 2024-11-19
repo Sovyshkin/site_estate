@@ -52,7 +52,6 @@ ul{
 body {
   min-height: 100vh;
   color: #000 !important;
-  background: var(--color-background);
   font-family: "Poppins", sans-serif !important;
   transition: color 0.5s, background-color 0.5s;
   line-height: 1.6;

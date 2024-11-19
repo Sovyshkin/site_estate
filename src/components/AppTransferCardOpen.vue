@@ -186,7 +186,7 @@ export default defineComponent({
 
 <template>
   <div class="card-wrapper">
-    <div class="img">
+    <div class="img" v-if="INFO.img.length > 0">
       <Carousel :autoplay="4000" :wrap-around="true">
         <Slide v-for="slide in INFO.img" :key="slide">
           <div class="carousel__item">
@@ -199,6 +199,9 @@ export default defineComponent({
           <Pagination />
         </template>
       </Carousel>
+    </div>
+    <div v-else class="wrap_img">
+      <img src="../assets/no_image.png" alt="" class="no_image" @click="open" />
     </div>
     <div class="card">
       <div class="modalDelete" :class="{ 'd-none': target == 0 }">

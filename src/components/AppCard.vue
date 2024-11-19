@@ -75,6 +75,7 @@ export default {
     if (this.id) {
       this.load_info();
     }
+    console.log(this.img);
   },
 };
 </script>
@@ -82,12 +83,15 @@ export default {
 <template>
   <div class="card">
     <img
-      v-if="img"
+      v-if="img.length > 0"
       class="card-img-top"
       @click="open"
-      :src="getImage(Array.from(img)[0])"
+      :src="`http://sneginqd.beget.tech/${Array.from(img)[0]}`"
       alt=""
     />
+    <div v-else class="wrap_img" @click="open">
+      <img src="../assets/no_image.png" alt="" class="no_image" />
+    </div>
     <div class="card-body">
       <h5 class="card-title">
         <span class="title">{{ title }}</span>

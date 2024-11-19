@@ -18,7 +18,7 @@ export default {
   methods: {
     async notifications() {
       let response = await axios.post(`/notifications`, {
-        nameModel: "event",
+        nameModel: "events",
       });
 
       this.bans = response.data.bans;
@@ -41,7 +41,7 @@ export default {
 <template>
   <ul class="list-events">
     <li class="item-event">
-      <RouterLink to="/admin/requests?nameModel=bans&category=event">
+      <RouterLink to="/admin/requests?nameModel=bans&category=events">
         <div class="event">
           Бани <br />
           Сауны <br />
@@ -53,7 +53,7 @@ export default {
       </RouterLink>
     </li>
     <li class="item-event">
-      <RouterLink to="/admin/requests?nameModel=massage&category=event">
+      <RouterLink to="/admin/requests?nameModel=massage&category=events">
         <div class="event">
           Массаж <br />
           СПА
@@ -64,7 +64,7 @@ export default {
       </RouterLink>
     </li>
     <li class="item-event">
-      <RouterLink to="/admin/requests?nameModel=restaurants&category=event">
+      <RouterLink to="/admin/requests?nameModel=restaurants&category=events">
         <div class="event">
           Рестораны <br />
           Кафе
@@ -75,7 +75,7 @@ export default {
       </RouterLink>
     </li>
     <li class="item-event">
-      <RouterLink to="/admin/requests?nameModel=nightClubs&category=event">
+      <RouterLink to="/admin/requests?nameModel=nightClubs&category=events">
         <div class="event">Ночные клубы</div>
         <div v-if="nightClubs" class="alert">
           {{ nightClubs }}
@@ -83,7 +83,7 @@ export default {
       </RouterLink>
     </li>
     <li class="item-event">
-      <RouterLink to="/admin/requests?nameModel=hoofing&category=event">
+      <RouterLink to="/admin/requests?nameModel=hoofing&category=events">
         <div class="event">Кальянные</div>
         <div v-if="hoofing" class="alert">
           {{ hoofing }}
@@ -91,7 +91,7 @@ export default {
       </RouterLink>
     </li>
     <li class="item-event">
-      <RouterLink to="/admin/requests?nameModel=karaoke&category=event">
+      <RouterLink to="/admin/requests?nameModel=karaoke&category=events">
         <div class="event">Караоке</div>
         <div v-if="karaoke" class="alert">
           {{ karaoke }}
@@ -99,7 +99,7 @@ export default {
       </RouterLink>
     </li>
     <li class="item-event">
-      <RouterLink to="/admin/requests?nameModel=ratrak&category=event">
+      <RouterLink to="/admin/requests?nameModel=ratrak&category=events">
         <div class="event">
           Ратрак <br />
           Снегоход
@@ -110,7 +110,7 @@ export default {
       </RouterLink>
     </li>
     <li class="item-event">
-      <RouterLink to="/admin/requests?nameModel=helicopter&category=event">
+      <RouterLink to="/admin/requests?nameModel=helicopter&category=events">
         <div class="event">
           Вертолёт <br />
           Параплан
@@ -121,7 +121,7 @@ export default {
       </RouterLink>
     </li>
     <li class="item-event">
-      <RouterLink to="/admin/requests?nameModel=zoos&category=event">
+      <RouterLink to="/admin/requests?nameModel=zoos&category=events">
         <div class="event">
           Зоопарки <br />
           Музеи

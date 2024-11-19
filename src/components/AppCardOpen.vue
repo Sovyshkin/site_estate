@@ -527,6 +527,23 @@ export default defineComponent({
         console.log(err);
       }
     },
+    async deleteCardReal() {
+      try {
+        await axios
+        .post("/deleteCard", {
+          id: this.INFO.id,
+          name: this.$route.query.name,
+          real: true
+        })
+        .then((e) => {
+          if (e.data.status == "200") {
+            this.$router.go(-1);
+          }
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    },
   },
 });
 </script>
@@ -1095,7 +1112,7 @@ export default defineComponent({
         </div>
       </div> -->
       <div class="left">
-        <div class="img">
+        <div class="img" v-if="INFO.img">
           <Carousel :autoplay="4000" :wrap-around="true">
             <Slide v-for="slide in INFO.img" :key="slide">
               <div class="carousel__item" v-if="slide">
@@ -1108,6 +1125,14 @@ export default defineComponent({
               <Pagination />
             </template>
           </Carousel>
+        </div>
+        <div v-else class="wrap_img">
+          <img
+            src="../assets/no_image.png"
+            alt=""
+            class="no_image"
+            @click="open"
+          />
         </div>
         <div class="info">
           <div class="nameWrapp">
@@ -1228,7 +1253,11 @@ export default defineComponent({
       </div>
       <div class="reviews"></div>
       <div class="button-wrapper" v-if="!view">
-        <button v-if="edit" @click="goBooking" class="btn btn-secondary reqs">
+        <button
+          v-if="edit && !INFO.done"
+          @click="goBooking"
+          class="btn btn-secondary reqs"
+        >
           Запросы бронирования
           <div class="alert" v-if="countReqs">{{ countReqs }}</div>
         </button>
@@ -1238,11 +1267,15 @@ export default defineComponent({
         <button @click="goEdit" class="btn btn-light" v-if="edit">
           Редактировать
         </button>
-        <button v-if="id" class="btn btn-brone" @click="goCalendar">
+        <button
+          v-if="id && !INFO.done"
+          class="btn btn-brone"
+          @click="goCalendar"
+        >
           Забронировать
         </button>
         <button
-          v-if="!id"
+          v-if="!id && !INFO.done"
           class="btn btn-brone"
           @click="this.$router.push({ name: 'register' })"
         >
@@ -1251,7 +1284,7 @@ export default defineComponent({
         <button
           @click="modalDelete = 1"
           class="btn btn-danger btn-delete"
-          v-if="edit"
+          v-if="edit && !INFO.done"
         >
           Снять с публикации
         </button>

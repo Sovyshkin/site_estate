@@ -51,15 +51,12 @@ export default {
       id: "",
     };
   },
-  mounted() {
-    this.loadCategory();
-    this.check_admin();
-    this.loadInfo();
-  },
   methods: {
     loadCategory() {
       if (this.$route.path.includes("habitation")) {
         this.category = "habitation";
+      } else if (this.$route.path.includes("event")) {
+        this.category = "events";
       }
     },
 
@@ -89,7 +86,7 @@ export default {
       if (this.$route.path == `/event/items`) {
         let events = await axios.post(`/event`, {
           id: this.getCookieValue("id"),
-          category: this.$route.path.slice(1, -6),
+          category: "events",
           name: this.$route.query.name,
         });
         this.INFO = events.data.cards.reverse();
@@ -283,6 +280,11 @@ export default {
       this.live_whith_animals = "";
       await this.loadInfo();
     },
+  },
+  mounted() {
+    this.loadCategory();
+    this.check_admin();
+    this.loadInfo();
   },
 };
 </script>
