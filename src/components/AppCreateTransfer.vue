@@ -563,7 +563,11 @@ export default defineComponent({
               </div>
             </label>
 
-            <Carousel v-if="files != ``" :autoplay="4000" :wrap-around="true">
+            <Carousel
+              v-if="files != `` && files.length > 1"
+              :autoplay="4000"
+              :wrap-around="true"
+            >
               <Slide v-for="slide in files" :key="slide">
                 <div class="carousel__item">
                   <div class="imgCross">
@@ -580,6 +584,12 @@ export default defineComponent({
                 <Pagination />
               </template>
             </Carousel>
+            <div class="imgCross" v-else v-for="slide in files" :key="slide">
+              <img :ref="url(slide)" :src="url(slide)" alt="" />
+              <button @click="remove(slide)" class="cross">
+                <ion-icon name="close-outline"></ion-icon>
+              </button>
+            </div>
 
             <Carousel v-if="img != ``" :autoplay="4000" :wrap-around="true">
               <Slide v-for="slide in img" :key="slide">
