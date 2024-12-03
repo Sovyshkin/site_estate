@@ -24,6 +24,7 @@ export default defineComponent({
       admin: ``,
       target: 0,
       phone: "",
+      phoneCall: "",
       fromdate: Date,
       todate: Date,
       adults: ``,
@@ -41,6 +42,10 @@ export default defineComponent({
       email: "",
       view: false,
       address: ``,
+      region: "",
+      city: "",
+      street: "",
+      numberHouse: "",
       point: ``,
       edit: false,
       switch: 2,
@@ -145,22 +150,17 @@ export default defineComponent({
       paid: false,
     };
   },
-  mounted() {
-    this.check_admin();
-    this.loadCard();
-    this.loadNumber();
-    this.renderMap();
-  },
   methods: {
     async renderMap() {
-      await axios.get(`https://geocode-maps.yandex.ru/1.x/`, {
-        params: {
-          apikey: "62143967-f105-468b-b0e5-f820e63f8c40",
-          geocode: `Шерегеш+${this.address}`,
-          format: "json",
-        },
-      });
-      let address = `Шерегеш ${this.address}`;
+      // await axios.get(`https://geocode-maps.yandex.ru/1.x/`, {
+      //   params: {
+      //     apikey: "62143967-f105-468b-b0e5-f820e63f8c40",
+      //     geocode: `${this.city}+${this.address}`,
+      //     format: "json",
+      //   },
+      // });
+      let address = `${this.INFO.city} ${this.INFO.street} ${this.INFO.numberHouse}`;
+      console.log(address);
       ymaps.ready(() => {
         let myMap; // объявим переменную для карты
         function init() {
@@ -215,11 +215,8 @@ export default defineComponent({
       });
       this.paid = response.data.paid;
       this.INFO = response.data.card;
-      this.address = response.data.card.address
-        .replace(` `, `+`)
-        .replace(`, `, `+`)
-        .replace(` `, `+`);
       this.countReqs = response.data.countReqs;
+      this.phoneCall = response.data.phone;
     },
     getDate(data) {
       let date = new Date(data);
@@ -243,7 +240,7 @@ export default defineComponent({
       this.$router.push({
         path: "/create-card",
         query: {
-          id: this.INFO.id,
+          id: this.$route.query.id,
           name: this.$route.query.name,
           edit: true,
           subcategory: this.INFO.subcategory,
@@ -493,9 +490,11 @@ export default defineComponent({
     async payment() {
       let response = await axios.post(`/payment`, {
         name: this.INFO.name,
-        price: this.INFO.price * 0.05,
+        price: this.INFO.price,
         id: this.INFO.id,
         userID: this.INFO.userID,
+        clientID: this.id,
+        category: "hotel",
       });
       this.paymentRef = response.data.paymentRef;
       this.success = response.data.success;
@@ -530,20 +529,26 @@ export default defineComponent({
     async deleteCardReal() {
       try {
         await axios
-        .post("/deleteCard", {
-          id: this.INFO.id,
-          name: this.$route.query.name,
-          real: true
-        })
-        .then((e) => {
-          if (e.data.status == "200") {
-            this.$router.go(-1);
-          }
-        });
+          .post("/deleteCard", {
+            id: this.INFO.id,
+            name: this.$route.query.name,
+            real: true,
+          })
+          .then((e) => {
+            if (e.data.status == "200") {
+              this.$router.go(-1);
+            }
+          });
       } catch (err) {
         console.log(err);
       }
     },
+  },
+  async mounted() {
+    this.check_admin();
+    await this.loadCard();
+    this.loadNumber();
+    this.renderMap();
   },
 });
 </script>
@@ -1150,7 +1155,9 @@ export default defineComponent({
               {{ INFO[ind] }}
             </span>
           </div>
-          <span class="address">{{ INFO.address }}</span>
+          <span class="address"
+            >{{ INFO.city }} {{ INFO.street }} {{ INFO.numberHouse }}</span
+          >
           <span class="phone">{{ INFO.phone }}</span>
           <span class="description">{{ INFO.p }}</span>
           <div class="messengers" v-if="paid">
@@ -1175,13 +1182,13 @@ export default defineComponent({
           >
             Полная информация
           </button>
-          <button
+          <!-- <button
             v-if="INFO.subcategory != 'rooms'"
             class="btn btn-light btn-rooms"
             @click="this.switch = 1"
           >
             Комнаты
-          </button>
+          </button> -->
           <button class="btn btn-light btn-map" @click="this.switch = 2">
             Карта
           </button>
@@ -1192,9 +1199,9 @@ export default defineComponent({
             class="map"
             :class="{ none: this.switch == 1 }"
           ></div>
-          <button class="btn publish" v-if="edit" @click="publishRoom = 1">
+          <!-- <button class="btn publish" v-if="edit" @click="publishRoom = 1">
             Опубликовать комнату
-          </button>
+          </button> -->
           <button class="btn btn-calendar" @click="goCalendar">
             Посмотреть свободные даты
           </button>
@@ -1298,8 +1305,18 @@ export default defineComponent({
         <button @click="backPublish" class="btn publish" v-if="INFO.done">
           Опубликовать
         </button>
-        <button @click="payment" class="btn publish" v-if="confirm">
+        <!-- <button @click="payment" class="btn publish" v-if="confirm">
           Опубликовать
+        </button> -->
+        <button
+          @click="payment"
+          class="btn btn-success publish"
+          v-if="confirm && !phoneCall"
+        >
+          Оплатить
+        </button>
+        <button class="btn btn-success publish" v-if="confirm && phoneCall">
+          <a :href="`tel: ${phoneCall}`">Связаться</a>
         </button>
       </div>
     </div>
@@ -1333,6 +1350,16 @@ export default defineComponent({
   padding: 7px 12px;
   color: #fff;
   font-weight: 550;
+}
+.btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn * {
+  font-weight: 600;
 }
 
 .btn-brone {

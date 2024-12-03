@@ -123,7 +123,11 @@ export default {
         @click="
           $router.push({
             path: `/transfer/card`,
-            query: { id: card.id, confirm: card.status == 'Ждет оплаты' },
+            query: {
+              id: card.id,
+              confirm:
+                card.status == 'Ждет оплаты' || card.status == 'Оплачено',
+            },
           })
         "
         v-for="(card, index) in transfers"

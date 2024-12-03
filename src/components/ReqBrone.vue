@@ -24,12 +24,13 @@ export default {
       return day.format(`D MMMM, HH:mm Z UTC`);
     },
 
-    async send_mail(name) {
+    async send_mail(name, accept) {
       await axios.post(`/send_brone`, {
         cardID: this.cardID,
         name: name,
         chatID: this.chatID,
         email: this.email,
+        accept,
       });
     },
 
@@ -43,9 +44,10 @@ export default {
       this.email = response.data.email;
       this.status = response.data.status;
       this.message = response.data.message;
+      let accept = response.data.accept;
       this.request();
       if (this.status == 200) {
-        this.send_mail("transfer");
+        this.send_mail(nameModel, accept);
       }
       setTimeout(() => {
         this.message = "";
@@ -62,9 +64,10 @@ export default {
       this.email = response.data.email;
       this.status = response.data.status;
       this.message = response.data.message;
+      let accept = response.data.accept;
       this.request();
       if (this.status == 200) {
-        this.send_mail("transfer");
+        this.send_mail(nameModel, accept);
       }
       setTimeout(() => {
         this.message = "";

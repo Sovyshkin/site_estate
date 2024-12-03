@@ -71,8 +71,9 @@ export default {
       class="done status"
       v-if="status"
       :class="{
-        gr: status == 'Ждет оплаты',
+        yel: status == 'Ждет оплаты',
         yel: status == 'Ждет подтверждения',
+        gr: status == 'Оплачено',
       }"
     >
       {{ status }}

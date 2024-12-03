@@ -11,6 +11,9 @@ export default {
   methods: mapActions(["getNotifications"]),
   mounted() {
     this.getNotifications("reqAll");
+    setInterval(() => {
+      this.getNotifications("reqAll");
+    }, 3000);
   },
 };
 </script>

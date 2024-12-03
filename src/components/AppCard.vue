@@ -26,12 +26,21 @@ export default {
       if (this.fromMyAds) {
         this.$router.push({
           path: "/card",
-          query: { id: this.id, name: this.nameCard, edit: this.fromMyAds },
+          query: {
+            id: this.id,
+            name: this.nameCard,
+            edit: this.fromMyAds,
+            confirm: this.status == "Ждет оплаты" || this.status == "Оплачено",
+          },
         });
       } else {
         this.$router.push({
           path: "/card",
-          query: { id: this.id, name: this.nameCard },
+          query: {
+            id: this.id,
+            name: this.nameCard,
+            confirm: this.status == "Ждет оплаты" || this.status == "Оплачено",
+          },
         });
       }
     },
@@ -75,7 +84,7 @@ export default {
     if (this.id) {
       this.load_info();
     }
-    console.log(this.img);
+    console.log(this.status);
   },
 };
 </script>
@@ -143,8 +152,9 @@ export default {
       class="done status"
       v-if="status"
       :class="{
-        gr: status == 'Ждет оплаты',
+        yel: status == 'Ждет оплаты',
         yel: status == 'Ждет подтверждения',
+        gr: status == 'Оплачено',
       }"
     >
       {{ status }}

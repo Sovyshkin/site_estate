@@ -30,6 +30,7 @@ export default defineComponent({
       confirm: false,
       id: "",
       countReqs: 0,
+      phone: "",
     };
   },
   methods: {
@@ -59,18 +60,21 @@ export default defineComponent({
       this.confirm = this.$route.query.confirm;
       let response = await axios.post(`/transfer`, {
         id: this.$route.query.id,
+        book: false,
+        clientID: this.id,
       });
       this.INFO = response.data.transfer;
       this.passenger2 = this.INFO.passenger / 2;
       this.countReqs = response.data.countReqs;
+      this.phone = response.data.phone;
       if (this.id == this.INFO.userID) {
         this.admin = true;
       } else {
         this.admin = false;
       }
-      if (this.confirm) {
-        this.payment();
-      }
+      // if (this.confirm) {
+      //   this.payment();
+      // }
     },
     async deleteCard() {
       await axios
@@ -142,6 +146,8 @@ export default defineComponent({
         price: this.INFO.price_sit,
         id: this.INFO.id,
         userID: this.INFO.userID,
+        clientID: this.id,
+        category: "transfer",
       });
       this.paymentRef = response.data.paymentRef;
       this.success = response.data.success;
@@ -178,15 +184,15 @@ export default defineComponent({
       }, 3000);
     },
   },
-  mounted() {
-    this.loadCard();
+  async mounted() {
+    await this.loadCard();
   },
 });
 </script>
 
 <template>
   <div class="card-wrapper">
-    <div class="img" v-if="INFO.img.length > 0">
+    <div class="img" v-if="INFO.img">
       <Carousel :autoplay="4000" :wrap-around="true">
         <Slide v-for="slide in INFO.img" :key="slide">
           <div class="carousel__item">
@@ -194,7 +200,7 @@ export default defineComponent({
           </div>
         </Slide>
 
-        <template #addons>
+        <template #addons v-if="INFO.img.length > 0">
           <Navigation />
           <Pagination />
         </template>
@@ -225,7 +231,9 @@ export default defineComponent({
           <div class="city">
             <div class="first">
               <span>{{ INFO.cityfrom }}</span>
-              <span class="sub">Всего мест: {{ INFO.passenger }}</span>
+              <span class="sub"
+                >Всего мест: {{ INFO.passenger - INFO.boardedPlaces }}</span
+              >
             </div>
             <div class="second">
               <span>{{ INFO.cityto }}</span>
@@ -297,7 +305,11 @@ export default defineComponent({
       </div>
       <div class="reviews"></div>
       <div class="button-wrapper" v-if="!view">
-        <button v-if="!admin && id" class="btn info_open" @click="open_book">
+        <button
+          v-if="!admin && id && !confirm"
+          class="btn info_open"
+          @click="open_book"
+        >
           Забронировать
         </button>
         <button
@@ -337,6 +349,9 @@ export default defineComponent({
           v-if="INFO.done"
         >
           Опубликовать
+        </button>
+        <button class="btn btn-success publish" v-if="confirm && phone">
+          <a :href="`tel: ${phone}`">Связаться</a>
         </button>
         <button @click="payment" class="btn btn-success publish" v-if="confirm">
           Оплатить
@@ -653,6 +668,13 @@ button:active {
 
 .btn {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn * {
+  font-weight: 600;
 }
 
 @media (max-width: 1250px) {

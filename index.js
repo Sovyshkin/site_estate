@@ -15,7 +15,7 @@ const mkdirp = require("mkdirp");
 const nodemailer = require("nodemailer");
 
 const TelegramApi = require("node-telegram-bot-api");
-const tokenBot = "6512089922:AAHLIKQKNVDzU7XBlqgGFkFcA2-W_E5-or0";
+const tokenBot = "6512089922:AAFHGNPPZSJY2V0__DSzML7ic-iytlqoDXs";
 
 // let bot = false;
 
@@ -221,7 +221,8 @@ app.post(`/filter`, async function (req, res) {
 
 app.post(`/transfer`, async function (req, res) {
   try {
-    let { id, book, places } = req.body;
+    let { id, book, places, clientID } = req.body;
+    console.log(id, book, places);
     let admin = false;
     let msg, status;
     if (book && id) {
@@ -246,7 +247,19 @@ app.post(`/transfer`, async function (req, res) {
     if (id && !book) {
       let transfer = await CardTransfer.findOne({ where: { id: id } });
       let reqs = await ReqBrone.findAll({ where: { cardID: id, done: false } });
-      res.send({ transfer, admin, countReqs: reqs.length });
+      let user = await UserModel.findOne({ where: { id: transfer.userID } });
+      let phone;
+      if (clientID) {
+        let request = await ReqBrone.findOne({
+          where: { cardID: id, clientID: clientID, userID: user.id },
+        });
+        if (request) {
+          if (request.status == "Оплачено") {
+            phone = user.phone;
+          }
+        }
+      }
+      res.send({ transfer, admin, countReqs: reqs.length, phone });
       return;
     }
     let transfer = await CardTransfer.findAll({ where: { done: false } });
@@ -526,7 +539,10 @@ app.post(`/create-card`, async function (req, res) {
       subcategory,
       id,
       phone,
-      address,
+      region,
+      city,
+      numberHouse,
+      street,
       email,
       price,
       p,
@@ -569,7 +585,10 @@ app.post(`/create-card`, async function (req, res) {
         let card = await HotelModel.findOne({ where: { id: id } });
         card.title = title;
         card.price = price;
-        card.address = address;
+        card.region = region;
+        card.city = city;
+        card.street = street;
+        card.numberHouse = numberHouse;
         card.phone = phone;
         card.img = img;
         card.p = p;
@@ -615,7 +634,10 @@ app.post(`/create-card`, async function (req, res) {
             subcategory: subcategory,
             title: title,
             phone: phone,
-            address: address,
+            region: region,
+            city: city,
+            street: street,
+            numberHouse: numberHouse,
             price: price,
             p: p,
             email: email,
@@ -694,7 +716,10 @@ app.post(`/create-card`, async function (req, res) {
       if (edit) {
         let card = await CardModel.findOne({ where: { id: id } });
         card.title = title;
-        card.address = address;
+        card.region = region;
+        card.city = city;
+        card.street = street;
+        card.numberHouse = numberHouse;
         card.phone = phone;
         card.email = email;
         card.img = img;
@@ -712,7 +737,10 @@ app.post(`/create-card`, async function (req, res) {
           userID: userID,
           title: title,
           phone: phone,
-          address: address,
+          region: region,
+          city: city,
+          street: street,
+          numberHouse: numberHouse,
           email: email,
           nameCard: "no",
           verified: false,
@@ -930,7 +958,19 @@ app.post(`/card`, async function (req, res) {
       }
       console.log(paid);
     }
-    res.send({ card, number, view, countReqs: reqs.length, paid });
+    let user = await UserModel.findOne({ where: { id: card.userID } });
+    let phone;
+    if (clientID) {
+      let request = await ReqBrone.findOne({
+        where: { cardID: id, clientID: clientID, userID: user.id },
+      });
+      if (request) {
+        if (request.status == "Оплачено") {
+          phone = user.phone;
+        }
+      }
+    }
+    res.send({ card, number, view, countReqs: reqs.length, paid, phone });
   } catch (err) {
     console.log(err);
   }
@@ -1274,7 +1314,7 @@ app.post(`/create_transfer`, async function (req, res) {
           passenger: passenger,
           length: length,
           userID: userID,
-          verified: false,
+          verified: true,
           point: point,
           boardedPlaces: 0,
           img: [],
@@ -1721,17 +1761,54 @@ app.post(`/delete_skipass`, async function (req, res) {
 
 app.post(`/payment`, async function (req, res) {
   try {
-    let { price, name, id, userID, category } = req.body;
+    let { price, name, id, userID, category, clientID } = req.body;
+    let client = await UserModel.findOne({ where: { id: clientID } });
     let user = await UserModel.findOne({ where: { id: userID } });
-    let { paymentRef, payment } = await initPayment(price, name);
+    let request = await ReqBrone.findOne({
+      where: { done: true, clientID, cardID: id, userID },
+    });
+    let totalPrice = request.places * price * 0.06;
+    console.log("Данные для платежа", totalPrice, price);
+    let { paymentRef, payment } = await initPayment(totalPrice, name);
     if (category == "transfer") {
       let transfer = await CardTransfer.findOne({ where: { id } });
       awaitPayment(payment).then(async (result) => {
         if (result) {
           console.log("Результат", result);
-          transfer.passenger -= 1;
-          user.paid.push({ id: transfer.id, category });
-          user.save();
+          request.status = "Оплачено";
+          await request.save();
+          if (bot) {
+            bot.sendMessage(
+              user.chatID,
+              `Клиент оплатил комиссию https://sneg-info.ru/transfer/card?id=${id} ${client.username} ${client.surname} ${client.phone}`
+            );
+          }
+          if (user.email) {
+            let transporter = nodemailer.createTransport({
+              host: "smtp.beget.com",
+              port: 2525,
+              secure: false,
+              auth: {
+                user: "codered-it@coderedit.site",
+                pass: "Stas_2001",
+              },
+            });
+
+            let mailOptions = {
+              from: "<codered-it@coderedit.site>",
+              to: user.email,
+              subject: "Оплата",
+              text: "Оплата",
+              html: `Клиент оплатил комиссию https://sneg-info.ru/transfer/card?id=${id} ${client.username} ${client.surname} ${client.phone}`,
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+              if (error) {
+                return console.log(error);
+              }
+              console.log("Message sent: %s", info.messageId);
+            });
+          }
           await transfer.save();
         }
       });
@@ -1740,9 +1817,41 @@ app.post(`/payment`, async function (req, res) {
       awaitPayment(payment).then(async (result) => {
         if (result) {
           console.log("Результат", result);
-          user.paid.push({ id: hotel.id, category });
-          user.save();
-          await transfer.save();
+          request.status = "Оплачено";
+          await request.save();
+          if (bot) {
+            bot.sendMessage(
+              user.chatID,
+              `Клиент оплатил комиссию https://sneg-info.ru/card?id=${id}&name=${category}' ${client.username} ${client.surname} ${client.phone}`
+            );
+          }
+          if (user.email) {
+            let transporter = nodemailer.createTransport({
+              host: "smtp.beget.com",
+              port: 2525,
+              secure: false,
+              auth: {
+                user: "codered-it@coderedit.site",
+                pass: "Stas_2001",
+              },
+            });
+
+            let mailOptions = {
+              from: "<codered-it@coderedit.site>",
+              to: user.email,
+              subject: "Оплата",
+              text: "Оплата",
+              html: `Клиент оплатил комиссию https://sneg-info.ru/card?id=${id}&name=${category}' ${client.username} ${client.surname} ${client.phone}`,
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+              if (error) {
+                return console.log(error);
+              }
+              console.log("Message sent: %s", info.messageId);
+            });
+          }
+          await hotel.save();
         }
       });
     } else if (category == "service") {
@@ -1750,9 +1859,41 @@ app.post(`/payment`, async function (req, res) {
       awaitPayment(payment).then(async (result) => {
         if (result) {
           console.log("Результат", result);
-          user.paid.push({ id: service.id, category });
-          user.save();
-          await transfer.save();
+          request.status = "Оплачено";
+          await request.save();
+          if (bot) {
+            bot.sendMessage(
+              user.chatID,
+              `Клиент оплатил комиссию https://sneg-info.ru/card?id=${id}&name=${category}' ${client.username} ${client.surname} ${client.phone}`
+            );
+          }
+          if (email) {
+            let transporter = nodemailer.createTransport({
+              host: "smtp.beget.com",
+              port: 2525,
+              secure: false,
+              auth: {
+                user: "codered-it@coderedit.site",
+                pass: "Stas_2001",
+              },
+            });
+
+            let mailOptions = {
+              from: "<codered-it@coderedit.site>",
+              to: user.email,
+              subject: "Оплата",
+              text: "Оплата",
+              html: `Клиент оплатил комиссию https://sneg-info.ru/card?id=${id}&name=${category}' ${client.username} ${client.surname} ${client.phone}`,
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+              if (error) {
+                return console.log(error);
+              }
+              console.log("Message sent: %s", info.messageId);
+            });
+          }
+          await service.save();
         }
       });
     } else {
@@ -1760,9 +1901,41 @@ app.post(`/payment`, async function (req, res) {
       awaitPayment(payment).then(async (result) => {
         if (result) {
           console.log("Результат", result);
-          user.paid.push({ id: card.id, category });
-          user.save();
-          await transfer.save();
+          request.status = "Оплачено";
+          await request.save();
+          if (bot) {
+            bot.sendMessage(
+              user.chatID,
+              `Клиент оплатил комиссию https://sneg-info.ru/card?id=${id}&name=${category}' ${client.username} ${client.surname} ${client.phone}`
+            );
+          }
+          if (email) {
+            let transporter = nodemailer.createTransport({
+              host: "smtp.beget.com",
+              port: 2525,
+              secure: false,
+              auth: {
+                user: "codered-it@coderedit.site",
+                pass: "Stas_2001",
+              },
+            });
+
+            let mailOptions = {
+              from: "<codered-it@coderedit.site>",
+              to: user.email,
+              subject: "Оплата",
+              text: "Оплата",
+              html: `Клиент оплатил комиссию https://sneg-info.ru/card?id=${id}&name=${category}' ${client.username} ${client.surname} ${client.phone}`,
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+              if (error) {
+                return console.log(error);
+              }
+              console.log("Message sent: %s", info.messageId);
+            });
+          }
+          await card.save();
         }
       });
     }
@@ -1821,14 +1994,138 @@ app.post(`/send_tg`, async function (req, res) {
 
 app.post(`/send_brone`, async function (req, res) {
   try {
-    let { chatID, email, name, cardID } = req.body;
-    if (name == "transfer") {
-      let card = await CardTransfer.findOne({ where: { id: cardID } });
+    let { chatID, email, name, cardID, accept } = req.body;
+    if (accept) {
+      if (name == "transfer") {
+        let card = await CardTransfer.findOne({ where: { id: cardID } });
+        if (bot) {
+          bot.sendMessage(
+            chatID,
+            `Водитель подтвердил ваше бронирование на https://sneg-info.ru/transfer/card?id=${cardID}&confirm=true, оплатите поездку в ближайшее время!`
+          );
+        }
+        if (email) {
+          let transporter = nodemailer.createTransport({
+            host: "smtp.beget.com",
+            port: 2525,
+            secure: false,
+            auth: {
+              user: "codered-it@coderedit.site",
+              pass: "Stas_2001",
+            },
+          });
+
+          let mailOptions = {
+            from: "<codered-it@coderedit.site>",
+            to: email,
+            subject: "Бронирование",
+            text: "Ваша бронь подтверждена",
+            html: `Водитель подтвердил ваше бронирование на https://sneg-info.ru/transfer/card?id=${cardID}&confirm=true, оплатите поездку в ближайшее время!`,
+          };
+
+          transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+              return console.log(error);
+            }
+            console.log("Message sent: %s", info.messageId);
+          });
+        }
+      } else if (name == "habitation") {
+        let card = await HotelModel.findOne({ where: { id: cardID } });
+        if (bot && chatID) {
+          bot.sendMessage(
+            chatID,
+            `Ваш запрос на бронирование принят https://sneg-info.ru/card?id=${cardID}&confirm=true&name=habitation оплатите бронирование в ближайшее время!`
+          );
+        }
+        let transporter = nodemailer.createTransport({
+          host: "smtp.beget.com",
+          port: 2525,
+          secure: false,
+          auth: {
+            user: "codered-it@coderedit.site",
+            pass: "Stas_2001",
+          },
+        });
+
+        let mailOptions = {
+          from: "<codered-it@coderedit.site>",
+          to: email,
+          subject: "Бронирование",
+          text: "Ваша бронь подтверждена",
+          html: `Ваш запрос на бронирование принят https://sneg-info.ru/card?id=${cardID}&confirm=true&name=habitation оплатите бронирование в ближайшее время!`,
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            return console.log(error);
+          }
+          console.log("Message sent: %s", info.messageId);
+        });
+        if (card.calendar) {
+          let calendar = JSON.parse(card.calendar);
+          for (let i = 0; i < brone.actives.length; i++) {
+            let item = brone.actives[i];
+            for (let j = 0; j < calendar.length; j++) {
+              if (calendar[j].date == item && !calendar[j].brone) {
+                calendar[j].await = false;
+                calendar[j].active = false;
+              }
+            }
+          }
+          card.calendar = JSON.stringify(calendar);
+          await card.save();
+        }
+      } else {
+        let card = await CardModel.findOne({ where: { id: cardID } });
+        if (bot && chatID) {
+          bot.sendMessage(
+            chatID,
+            `Ваш запрос на бронирование принят https://sneg-info.ru/card?id=${cardID}&confirm=true&name=${name} оплатите бронирование в ближайшее время!`
+          );
+        }
+        let transporter = nodemailer.createTransport({
+          host: "smtp.beget.com",
+          port: 2525,
+          secure: false,
+          auth: {
+            user: "codered-it@coderedit.site",
+            pass: "Stas_2001",
+          },
+        });
+
+        let mailOptions = {
+          from: "<codered-it@coderedit.site>",
+          to: email,
+          subject: "Бронирование",
+          text: "Ваша бронь подтверждена",
+          html: `Ваш запрос на бронирование принят https://sneg-info.ru/card?id=${cardID}&confirm=true&name=${name} оплатите бронирование в ближайшее время!`,
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            return console.log(error);
+          }
+          console.log("Message sent: %s", info.messageId);
+        });
+        if (card.calendar) {
+          let calendar = JSON.parse(card.calendar);
+          for (let i = 0; i < brone.actives.length; i++) {
+            let item = brone.actives[i];
+            for (let j = 0; j < calendar.length; j++) {
+              if (calendar[j].date == item && !calendar[j].brone) {
+                calendar[j].await = false;
+                calendar[j].active = false;
+              }
+            }
+          }
+          card.calendar = JSON.stringify(calendar);
+          await card.save();
+        }
+      }
+    } else {
       if (bot) {
-        bot.sendMessage(
-          chatID,
-          `Водитель подтвердил ваше бронирование на https://sneg-info.ru/transfer/card?id=${cardID}&confirm=true, оплатите поездку в ближайшее время!`
-        );
+        bot.sendMessage(chatID, `Водитель отменил ваше бронирование`);
       }
       if (email) {
         let transporter = nodemailer.createTransport({
@@ -1845,8 +2142,8 @@ app.post(`/send_brone`, async function (req, res) {
           from: "<codered-it@coderedit.site>",
           to: email,
           subject: "Бронирование",
-          text: "Ваша бронь подтверждена",
-          html: `Водитель подтвердил ваше бронирование на https://sneg-info.ru/transfer/card?id=${cardID}&confirm=true, оплатите поездку в ближайшее время!`,
+          text: "Ваша бронь отклонена",
+          html: `Водитель отменил ваше бронирование`,
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
@@ -1856,38 +2153,6 @@ app.post(`/send_brone`, async function (req, res) {
           console.log("Message sent: %s", info.messageId);
         });
       }
-    } else if (name == "habitation") {
-      let card = await HotelModel.findOne({ where: { id: cardID } });
-      if (bot && chatID) {
-        bot.sendMessage(
-          chatID,
-          `Ваш запрос на бронирование принят https://sneg-info.ru/card?id=${cardID}&confirm=true&name=habitation оплатите бронирование в ближайшее время!`
-        );
-      }
-      let transporter = nodemailer.createTransport({
-        host: "smtp.beget.com",
-        port: 2525,
-        secure: false,
-        auth: {
-          user: "codered-it@coderedit.site",
-          pass: "Stas_2001",
-        },
-      });
-
-      let mailOptions = {
-        from: "<codered-it@coderedit.site>",
-        to: email,
-        subject: "Бронирование",
-        text: "Ваша бронь подтверждена",
-        html: `Ваше бронирование на https://sneg-info.ru/transfer/card?id=${cardID}&confirm=true!`,
-      };
-
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          return console.log(error);
-        }
-        console.log("Message sent: %s", info.messageId);
-      });
     }
   } catch (err) {
     console.log(err);
@@ -2423,8 +2688,8 @@ app.post(`/myads`, async function (req, res) {
 
 app.post(`/transfer_days`, async function (req, res) {
   try {
-    let { month, cityfrom, cityto } = req.body;
-    console.log(month, cityfrom, cityto);
+    let { month, cityfrom, cityto, passenger } = req.body;
+    let Array = [];
     if (cityfrom && cityto) {
       let transfers = await CardTransfer.findAll({
         where: { cityfrom, cityto, done: false },
@@ -2450,7 +2715,12 @@ app.post(`/transfer_days`, async function (req, res) {
 
         return dateComparison;
       });
-      res.send({ days });
+      days.forEach((element) => {
+        if (passenger <= element.passenger - element.boardedPlaces) {
+          Array.push(element);
+        }
+      });
+      res.send({ Array });
     } else if (cityfrom && !cityto) {
       let transfers = await CardTransfer.findAll({
         where: { cityfrom, done: false },
@@ -2476,7 +2746,12 @@ app.post(`/transfer_days`, async function (req, res) {
 
         return dateComparison;
       });
-      res.send({ days });
+      days.forEach((element) => {
+        if (passenger <= element.passenger - element.boardedPlaces) {
+          Array.push(element);
+        }
+      });
+      res.send({ Array });
     } else if (!cityfrom && cityto) {
       let transfers = await CardTransfer.findAll({
         where: { cityto, done: false },
@@ -2502,7 +2777,12 @@ app.post(`/transfer_days`, async function (req, res) {
 
         return dateComparison;
       });
-      res.send({ days });
+      days.forEach((element) => {
+        if (passenger <= element.passenger - element.boardedPlaces) {
+          Array.push(element);
+        }
+      });
+      res.send({ Array });
     } else {
       let transfers = await CardTransfer.findAll({ where: { done: false } });
       let days = [];
@@ -2527,7 +2807,12 @@ app.post(`/transfer_days`, async function (req, res) {
 
         return dateComparison;
       });
-      res.send({ days });
+      days.forEach((element) => {
+        if (passenger <= element.passenger - element.boardedPlaces) {
+          Array.push(element);
+        }
+      });
+      res.send({ Array });
     }
   } catch (err) {
     console.log(err);
@@ -2804,7 +3089,7 @@ app.post(`/request_brone`, async function (req, res) {
           res.send({
             status: 400,
             message: `Превышает количество свободных мест! Осталось свободных мест: ${
-              transfer.passenger - transfer.boardedPlaces
+              card.passenger - card.boardedPlaces
             }`,
           });
         }
@@ -2915,6 +3200,7 @@ app.post(`/accept_request_brone`, async function (req, res) {
       let request = await ReqBrone.findOne({ where: { id } });
       if (request) {
         request.status = "Ждет оплаты";
+        request.done = true;
         let transfer = await CardTransfer.findOne({
           where: { id: request.cardID },
         });
@@ -2954,6 +3240,7 @@ app.post(`/accept_request_brone`, async function (req, res) {
             }
             card.calendar = JSON.stringify(calendar);
             request.status = "Ждет оплаты";
+            request.done = true;
             await card.save();
             await request.save();
             res.send({
@@ -2972,6 +3259,7 @@ app.post(`/accept_request_brone`, async function (req, res) {
             }
             card.calendar = JSON.stringify(cal2);
             request.status = "Ждет оплаты";
+            request.done = true;
             await card.save();
             await request.save();
             res.send({
@@ -2997,6 +3285,12 @@ app.post(`/reject_request_brone`, async function (req, res) {
     let request = await ReqBrone.findOne({ where: { id } });
     let card;
     if (request) {
+      if (name == "transfer") {
+        card = await CardTransfer.findOne({ where: { id: request.cardID } });
+        if (card) {
+          card.boardedPlaces -= request.places;
+        }
+      }
       request.done = true;
       request.status = "Отменен";
       let client = await UserModel.findOne({ where: { id: request.clientID } });
@@ -3004,6 +3298,7 @@ app.post(`/reject_request_brone`, async function (req, res) {
       res.send({
         status: 200,
         message: "Запрос успешно отклонён",
+        accept: false,
         chatID: client.chatID,
         email: client.email,
       });
@@ -3267,7 +3562,7 @@ app.post(`/myreq`, async function (req, res) {
     let { id } = req.body;
     if (id) {
       let info = await ReqBrone.findAll({
-        where: { clientID: id, done: false },
+        where: { clientID: id },
       });
       let cards = [];
       let hotels = [];
@@ -3427,25 +3722,3 @@ app.post(`/cancel_brone`, async function (req, res) {
     console.log(err);
   }
 });
-
-// app.get("/images/get", async (req, res) => {
-//   try {
-//     const filename = req.query.filename;
-//     console.log(`Получен запрос для файла: ${filename}`);
-
-//     const imagePath = path.join(__dirname, "assets", filename);
-//     console.log(`Путь к файлу: ${imagePath}`);
-
-//     if (!fs.existsSync(imagePath)) {
-//       console.error(`Файл не найден: ${imagePath}`);
-//       return res.status(404).json({ message: "Изображение не найдено" });
-//     }
-
-//     const imageData = await fs.readFile(imagePath);
-//     res.setHeader("Content-Type", "image/jpeg"); // Установите правильный MIME тип
-//     res.send(imageData);
-//   } catch (error) {
-//     console.error("Ошибка при получении изображения:", error);
-//     res.status(500).json({ message: "Внутренняя ошибка сервера" });
-//   }
-// });

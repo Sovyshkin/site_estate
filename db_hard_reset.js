@@ -9,7 +9,7 @@ let {
 const bcrypt = require("bcryptjs");
 
 const THE_FUCKING_CURE = async () => {
-  await sequelize.drop();
+  // await sequelize.drop();
   await sequelize.sync({
     alter: true,
   });

@@ -139,12 +139,7 @@ a {
 }
 .container {
   min-height: 70%;
-  /* max-height: 600px; */
-  /* background: rgba(255, 255, 255, 0.08); */
   border-radius: 16px;
-  /* box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2); */
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
   padding: 20px;
   display: flex;
   justify-content: center;

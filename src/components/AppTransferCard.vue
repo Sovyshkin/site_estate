@@ -103,7 +103,7 @@ export default defineComponent({
         <div class="city">
           <div class="">
             <span class="textCity">{{ cityfrom }}</span>
-            <span class="sub">Мест: {{ passenger }}</span>
+            <span class="sub">Мест: {{ passenger - boardedPlaces }}</span>
           </div>
           <div class="second">
             <span>{{ cityto }}</span>
@@ -186,8 +186,9 @@ export default defineComponent({
       class="done status"
       v-if="status"
       :class="{
-        gr: status == 'Ждет оплаты',
+        yel: status == 'Ждет оплаты',
         yel: status == 'Ждет подтверждения',
+        gr: status == 'Оплачено',
       }"
     >
       {{ status }}

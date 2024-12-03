@@ -281,10 +281,11 @@ export default {
       await this.loadInfo();
     },
   },
-  mounted() {
+  async mounted() {
     this.loadCategory();
     this.check_admin();
-    this.loadInfo();
+    await this.loadInfo();
+    await this.search();
   },
 };
 </script>

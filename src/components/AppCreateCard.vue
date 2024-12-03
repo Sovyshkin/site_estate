@@ -17,8 +17,6 @@ export default defineComponent({
       files: ``,
       img: "",
       title: ``,
-      address: ``,
-      email: "",
       phone: ``,
       price: null,
       description: ``,
@@ -92,6 +90,276 @@ export default defineComponent({
       live_whith_animals: "",
       additional: "",
       clone: false,
+      regions: [
+        {
+          name: "Кемеровская область",
+          cities: [
+            "Кемерово",
+            "Новокузнецк",
+            "Шерегеш",
+            "Прокопьевск",
+            "Междуреченск",
+            "Ленинск-Кузнецкий",
+            "Киселёвск",
+            "Юрга",
+            "Белово",
+            "Анжеро-Судженск",
+            "Берёзовский",
+            "Осинники",
+            "Мыски",
+            "Мариинск",
+            "Топки",
+            "Полысаево",
+            "Тайга",
+            "Таштагол",
+            "Гурьевск",
+            "Калтан",
+            "Салаир",
+          ],
+        },
+        {
+          name: "Томская область",
+          cities: [
+            "Томск",
+            "Асино",
+            "Бакчар",
+            "Белый Яр",
+            "Зырянское",
+            "Каргасок",
+            "Кожевниково",
+            "Колпашево",
+            "Кривошеино",
+            "Молчаново",
+            "Парабель",
+            "Первомайское",
+            "Тегульдет",
+            "Подгорное",
+            "Мельниково",
+          ],
+        },
+        {
+          name: "Республика Горный Алтай",
+          cities: [
+            "Горно-Алтайск",
+            "Кош-Агач",
+            "Майма",
+            "Онгудай",
+            "Турочак",
+            "Улаган",
+            "Усть-Кан",
+            "Усть-Кокса",
+            "Чемал",
+            "Чоя",
+            "Шебалино",
+          ],
+        },
+        {
+          name: "Алтайский край",
+          cities: [
+            "Барнаул",
+            "Бийск",
+            "Змеиногорск",
+            "Рубцовск",
+            "Алейск",
+            "Горняк",
+            "Камень-на-Оби",
+            "Славгород",
+            "Белокуриха",
+            "Заринск",
+            "Новоалтайск",
+            "Яровое",
+            "Алтайское",
+            "Баево",
+            "Благовещенка",
+            "Бурла",
+            "Быстрый Исток",
+            "Волчиха",
+            "Новоегорьевское",
+            "Ельцовка",
+            "Завьялово",
+            "Залесово",
+            "Зональное",
+            "Калманка",
+            "Ключи",
+            "Косиха",
+            "Красногорское",
+            "Краснощёково",
+            "Крутиха",
+            "Кулунда",
+            "Курья",
+            "Кытманово",
+            "Мамонтово",
+            "Михайловский",
+            "Гальбштадт",
+            "Новичиха",
+            "Павловск",
+            "Панкрушиха",
+            "Петропавловское",
+            "Поспелиха",
+            "Ребриха",
+            "Родино",
+            "Романово",
+            "Смоленское",
+            "Верх-Суетка",
+            "Советское",
+            "Солонешное",
+            "Солтон",
+            "Шелаболиха",
+            "Табуны",
+            "Тальменка",
+            "Тогул",
+            "Топчиха",
+            "Староалейское",
+            "Троицкое",
+            "Тюменцево",
+            "Угловское",
+            "Усть-Калманка",
+            "Усть-Чарышская Пристань",
+            "Хабары",
+            "Целинное",
+            "Чарышское",
+            "Шипуново",
+          ],
+        },
+        {
+          name: "Новосибирская область",
+          cities: [
+            "Новосибирск",
+            "Болотное",
+            "Каргат",
+            "Обь",
+            "Черепаново",
+            "Барабинск",
+            "Искитим",
+            "Куйбышев",
+            "Татарск",
+            "Чулым",
+            "Бердск",
+            "Карасук",
+            "Купино",
+            "Тогучин",
+            "Баган",
+            "Венгерово",
+            "Довольное",
+            "Здвинск",
+            "Колывань",
+            "Коченево",
+            "Кочки",
+            "Краснозерское",
+            "Кыштовка",
+            "Маслянино",
+            "Мошково",
+            "Ордынское",
+            "Северное",
+            "Сузун",
+            "Убинское",
+            "Усть-Тарка",
+            "Чаны",
+            "Чистоозерное",
+          ],
+        },
+        {
+          name: "Красноярский край",
+          cities: [
+            "Красноярск",
+            "Боготол",
+            "Енисейск",
+            "Иланский",
+            "Лесосибирск",
+            "Норильск",
+            "Уяр",
+            "Артемовск",
+            "Бородино",
+            "Заозерный",
+            "Канск",
+            "Минусинск",
+            "Сосновоборск",
+            "Шарыпово",
+            "Ачинск",
+            "Дивногорск",
+            "Игарка",
+            "Кодинск",
+            "Назарово",
+            "Ужур",
+            "Балахта",
+            "Березовка",
+            "Новобирилюссы",
+            "Богучаны",
+            "Большая Мурта",
+            "Большой Улуй",
+            "Дзержинское",
+            "Емельяново",
+            "Ермаковское",
+            "Идринское",
+            "Ирбейское",
+            "Казачинское",
+            "Каратузское",
+            "Козулька",
+            "Краснотуранск",
+            "Курагино",
+            "Шалинское",
+            "Мотыгино",
+            "Нижний Ингаш",
+            "Новоселово",
+            "Партизанское",
+            "Пировское",
+            "Агинское",
+            "Северо-Енисейский",
+            "Сухобузимское",
+            "Тасеево",
+            "Туруханск",
+            "Тюхтет",
+            "Шушенское",
+          ],
+        },
+        {
+          name: "Омская область",
+          cities: [
+            "Омск",
+            "Называевск",
+            "Исилькуль",
+            "Тара",
+            "Калачинск",
+            "Тюкалинск",
+            "Азово",
+            "Большеречье",
+            "Большие Уки",
+            "Горьковское",
+            "Знаменское",
+            "Исилькуль",
+            "Калачинск",
+            "Колосовка",
+            "Кормиловка",
+            "Крутинка",
+            "Любинский",
+            "Марьяновка",
+            "Москаленки",
+            "Муромцево",
+            "Называевск",
+            "Нижняя Омка",
+            "Нововаршавка",
+            "Одесское",
+            "Оконешниково",
+            "Ростовка",
+            "Павлоградка",
+            "Полтавка",
+            "Русская Поляна",
+            "Саргатское",
+            "Седельниково",
+            "Таврическое",
+            "Тара",
+            "Тевриз",
+            "Тюкалинск",
+            "Усть-Ишим",
+            "Черлак",
+            "Шербакуль",
+          ],
+        },
+      ],
+      city: "",
+      region: "",
+      street: "",
+      numberHouse: "",
     };
   },
   mounted() {
@@ -137,6 +405,21 @@ export default defineComponent({
       }
       return res;
     },
+    findRegionCity(s, f) {
+      console.log(this.region, this.city);
+      if (f == "region") {
+        let foundRegion = this.regions.find((obj) => obj.name == s);
+        return foundRegion;
+      } else if (f == "city") {
+        let foundCity;
+        this.region.cities.forEach((city) => {
+          if (city == s) {
+            foundCity = city;
+          }
+        });
+        return foundCity;
+      }
+    },
 
     async submitFiles() {
       let formData = new FormData();
@@ -150,8 +433,10 @@ export default defineComponent({
           price: this.price,
           p: this.description,
           phone: this.phone,
-          address: this.address,
-          email: this.email,
+          numberHouse: this.numberHouse,
+          street: this.street,
+          region: this.region.name,
+          city: this.city,
           userID: this.getCookieValue("id"),
           subcategory: this.$route.query.name,
           category: this.$route.query.category,
@@ -288,8 +573,10 @@ export default defineComponent({
           price: this.price,
           p: this.description,
           phone: this.phone,
-          address: this.address,
-          email: this.email,
+          region: this.region.name,
+          city: this.city,
+          numberHouse: this.numberHouse,
+          street: this.street,
           edit: true,
           login: true,
           floor: this.floor,
@@ -372,9 +659,13 @@ export default defineComponent({
           this.title = this.INFO.title;
           this.price = this.INFO.price;
           this.phone = this.INFO.phone;
-          this.address = this.INFO.address;
+          this.region = this.findRegionCity(this.INFO.region, "region");
+          if (this.region) {
+            this.city = this.findRegionCity(this.INFO.city, "city");
+          }
+          this.numberHouse = this.INFO.numberHouse;
+          this.street = this.INFO.street;
           this.description = this.INFO.p;
-          this.email = this.INFO.email;
           this.floor = this.INFO.floor;
           this.lease_term = this.INFO.lease_term;
           this.total_area = this.INFO.total_area;
@@ -776,16 +1067,36 @@ export default defineComponent({
           v-if="subcategory != 'hotels'"
           placeholder="Цена"
         />
+        <div class="input-group">
+          <div class="title">Регион:</div>
+          <div class="wrapper-for-input">
+            <select v-model="region">
+              <option v-for="region in regions" :value="region" :key="region">
+                {{ region.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div
+          class="input-group"
+          :class="{ active: this.region, 'd-none': !this.region }"
+        >
+          <div class="title">Город:</div>
+          <div class="wrapper-for-input" v-if="region">
+            <select v-model="city">
+              <option v-for="city in region.cities" :value="city" :key="city">
+                {{ city }}
+              </option>
+            </select>
+          </div>
+        </div>
 
-        <input
-          v-model="address"
-          type="text"
-          placeholder="г.Город, ул.Улица, д.Номер"
-        />
+        <div class="wrap-group-address">
+          <input type="text" placeholder="Улица" v-model="street" />
+          <input type="text" placeholder="Дом" v-model="numberHouse" />
+        </div>
 
         <input v-model="phone" type="tel" placeholder="Номер телефона" />
-
-        <input v-model="email" type="email" placeholder="Почта" />
       </div>
       <div class="body">
         <textarea
@@ -1052,26 +1363,6 @@ input[type="checkbox"] {
   height: auto !important;
 }
 
-input:nth-child(2) {
-  width: 95%;
-  height: 40px;
-}
-
-input:nth-child(3) {
-  width: 90%;
-  height: 40px;
-}
-
-input:nth-child(4) {
-  width: 85%;
-  height: 40px;
-}
-
-input:nth-child(5) {
-  width: 80%;
-  height: 40px;
-}
-
 #file {
   display: none;
 }
@@ -1095,6 +1386,12 @@ label {
 
 .carousel {
   height: 100%;
+}
+
+.wrap-group-address {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
 }
 @media (max-width: 426px) {
   .info {
@@ -1151,9 +1448,6 @@ img {
   height: 200px !important;
   object-fit: cover;
 }
-.title {
-  font-size: 20px;
-}
 .price {
   font-size: 15px;
 }
@@ -1198,6 +1492,50 @@ button:active {
   display: flex;
   gap: 10px;
   align-items: center;
+}
+
+.input-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.title {
+  color: #d5d5d5;
+  font-weight: 600;
+  line-height: 19px !important;
+  text-align: end;
+}
+
+.input-group .form-input {
+  width: 100%;
+}
+
+input,
+select {
+  border-radius: 5px;
+}
+
+.form-input {
+  padding: 5px 7px;
+  background-color: transparent;
+  border: 1px solid #d5d5d5;
+  box-shadow: 0px 0 10px 0 #ffffff71;
+  color: #fff;
+
+  transition: color 300ms;
+}
+
+.form-input::placeholder {
+  text-align: center;
+  font-weight: 500;
+  color: #d5d5d5;
+}
+
+.form-input:focus,
+.form-input:hover {
+  color: #d5d5d5;
 }
 
 @media (max-width: 990px) {

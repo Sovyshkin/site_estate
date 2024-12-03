@@ -22,9 +22,11 @@ export default {
       transfers_day: [],
       inputDate: "",
       regions: [
+        { name: "", cities: [] },
         {
           name: "Кемеровская область",
           cities: [
+            "",
             "Кемерово",
             "Новокузнецк",
             "Шерегеш",
@@ -51,6 +53,7 @@ export default {
         {
           name: "Томская область",
           cities: [
+            "",
             "Томск",
             "Асино",
             "Бакчар",
@@ -71,6 +74,7 @@ export default {
         {
           name: "Республика Горный Алтай",
           cities: [
+            "",
             "Горно-Алтайск",
             "Кош-Агач",
             "Майма",
@@ -87,6 +91,7 @@ export default {
         {
           name: "Алтайский край",
           cities: [
+            "",
             "Барнаул",
             "Бийск",
             "Змеиногорск",
@@ -155,6 +160,7 @@ export default {
         {
           name: "Новосибирская область",
           cities: [
+            "",
             "Новосибирск",
             "Болотное",
             "Каргат",
@@ -192,6 +198,7 @@ export default {
         {
           name: "Красноярский край",
           cities: [
+            "",
             "Красноярск",
             "Боготол",
             "Енисейск",
@@ -246,6 +253,7 @@ export default {
         {
           name: "Омская область",
           cities: [
+            "",
             "Омск",
             "Называевск",
             "Исилькуль",
@@ -333,8 +341,9 @@ export default {
         cityfrom: this.city,
         cityto: this.cityTo,
         month: this.month,
+        passenger: this.passenger,
       });
-      let days = response.data.days;
+      let days = response.data.Array;
       this.Transfer = days;
       if (days) {
         this.transfers_day = [];
@@ -412,14 +421,14 @@ export default {
             <!-- <input v-model="cityfrom" type="text" placeholder="Откуда" /> -->
             <div class="item-input-group">
               <span>Регион (откуда)</span>
-              <select v-model="region">
+              <select v-model="region" @change="calendar">
                 <option v-for="region in regions" :value="region" :key="region">
                   {{ region.name }}
                 </option>
               </select>
               <div class="item-input-group" v-if="region">
                 <span>Город</span>
-                <select v-model="city">
+                <select v-model="city" @change="calendar">
                   <option
                     v-for="city in region.cities"
                     :value="city"
@@ -432,14 +441,14 @@ export default {
             </div>
             <div class="item-input-group">
               <span>Регион (куда)</span>
-              <select v-model="regionTo">
+              <select v-model="regionTo" @change="calendar">
                 <option v-for="region in regions" :value="region" :key="region">
                   {{ region.name }}
                 </option>
               </select>
               <div class="item-input-group" v-if="regionTo">
                 <span>Город</span>
-                <select v-model="cityTo">
+                <select v-model="cityTo" @change="calendar">
                   <option
                     v-for="city in regionTo.cities"
                     :value="city"
@@ -462,10 +471,14 @@ export default {
               />
               <span class="emp">Пусто</span>
               <div class="item-wrap">
-                <input v-model="passenger" type="number" min="1" />
-                <button class="btn btn-primary" type="submit">
-                  Выбрать дату
-                </button>
+                <span>Мест:</span>
+                <input
+                  v-model="passenger"
+                  type="number"
+                  min="1"
+                  @change="calendar"
+                />
+                <button class="btn btn-primary" type="submit">Поиск</button>
               </div>
             </div>
           </div>
@@ -697,6 +710,12 @@ input::placeholder {
 
 .item-wrap input {
   width: 20%;
+}
+
+.item-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .emp {
