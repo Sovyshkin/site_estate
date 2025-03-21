@@ -37,7 +37,10 @@ export default {
       <RouterLink to="/habitation">
         <div class="event habitation">
           Проживание
-          <img src="https://trisovy.ru/images/pages/3/thumbs/3.jpg" alt="" />
+          <img
+            src="https://avatars.mds.yandex.net/i?id=406963af22165700c84d6f8423ac706e76fbbade-12728079-images-thumbs&n=13"
+            alt=""
+          />
         </div>
       </RouterLink>
     </li>
@@ -156,7 +159,8 @@ export default {
   transition: all 500ms;
 }
 
-.transfer:hover {
+.transfer:hover,
+.habitation:hover {
   color: black;
 }
 
