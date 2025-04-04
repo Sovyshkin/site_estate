@@ -4,12 +4,14 @@ import axios from "axios";
 import AppTransferCard from "/src/components/AppTransferCard.vue";
 import AppService from "/src/components/AppService.vue";
 import AppCard from "/src/components/AppCard.vue";
+import AppEmpty from "./AppEmpty.vue";
 
 export default {
   components: {
     AppTransferCard,
     AppService,
     AppCard,
+    AppEmpty,
     RouterLink,
   },
 
@@ -117,7 +119,7 @@ export default {
           Опубликовать недвижимость
         </RouterLink>
       </div>
-      <div class="wrapper-card">
+      <div class="wrapper-card" v-if="transfers.length || services.length || cards.length || hotels.length">
         <app-transfer-card
           v-if="transfers"
           @click="
@@ -193,6 +195,7 @@ export default {
           :done="cardInfo.done"
         />
       </div>
+      <AppEmpty v-else/>
     </div>
   </div>
 </template>

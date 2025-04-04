@@ -43,8 +43,8 @@ export default {
       this.loadNews();
     },
   },
-  mounted() {
-    this.loadNews();
+  async mounted() {
+    await this.loadNews();
   },
 };
 </script>

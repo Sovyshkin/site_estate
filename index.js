@@ -15,7 +15,7 @@ const mkdirp = require("mkdirp");
 const nodemailer = require("nodemailer");
 
 const TelegramApi = require("node-telegram-bot-api");
-const tokenBot = "66512089922:AAEFdDl2AACcdd-mRZxdQ_MhyLBLpdbcJio";
+const tokenBot = "6512089922:AAHB9BFiyZpC6PBMWz3AQJ0HO9Hyh38qO2c";
 
 // let bot = false;
 
@@ -289,7 +289,7 @@ app.post(`/news`, async function (req, res) {
   let { id } = req.body;
   let user;
   if (id) {
-    user = await UserModel.findOne({ id: id });
+    user = await UserModel.findOne({ where: { id } });
     if (user.role == "ADMIN") {
       admin = true;
     } else {
@@ -579,6 +579,7 @@ app.post(`/create-card`, async function (req, res) {
       poolClose,
       poolHeating,
     } = req.body;
+    console.log('категория', category)
     if (category == `habitation`) {
       if (edit) {
         console.log(1);
@@ -1113,7 +1114,6 @@ app.post(`/ads`, async function (req, res) {
       if (user.role == "ADMIN") {
         admin = true;
       } else {
-        а;
         admin = false;
       }
     }
@@ -1122,7 +1122,6 @@ app.post(`/ads`, async function (req, res) {
         where: {
           category: category,
           subcategory: name,
-          verified: true,
           done: false,
         },
       });
@@ -2345,6 +2344,7 @@ app.post(`/notifications`, async function (req, res) {
       });
       if (forChildren) {
         forChildren = forChildren.length;
+        console.log('Количество детям',forChildren)
       }
 
       let instructorTours = await CardModel.findAll({

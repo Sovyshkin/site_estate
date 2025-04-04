@@ -52,12 +52,20 @@ export default {
     };
   },
   methods: {
-    loadCategory() {
+    async loadCategory() {
       if (this.$route.path.includes("habitation")) {
         this.category = "habitation";
       } else if (this.$route.path.includes("event")) {
         this.category = "events";
-      }
+      } else if (this.$route.path.includes("forChildren")) {
+        this.category = 'forChildren'
+      } else if (this.$route.path.includes("instructor-tours")) {
+        this.category = 'instructorTours'
+      } else if (this.$route.path.includes("ads")) {
+        this.category = 'ads'
+      } else if (this.$route.path.includes("rental")) {
+        this.category = 'rental'
+      } 
     },
 
     async check_admin() {
@@ -96,7 +104,7 @@ export default {
       if (this.$route.path == `/rental/items`) {
         let rental = await axios.post(`/rental`, {
           id: this.getCookieValue("id"),
-          category: this.$route.path.slice(1, -6),
+          category: 'rental',
           name: this.$route.query.name,
         });
         this.INFO = rental.data.cards.reverse();
@@ -106,7 +114,7 @@ export default {
       if (this.$route.path == `/forChildren/items`) {
         let forChildren = await axios.post(`/forChildren`, {
           id: this.getCookieValue("id"),
-          category: this.$route.path.slice(1, -6),
+          category: 'forChildren',
           name: this.$route.query.name,
         });
         this.INFO = forChildren.data.cards.reverse();
@@ -116,7 +124,7 @@ export default {
       if (this.$route.path == `/instructor-tours/items`) {
         let InstructorTours = await axios.post(`/instructor-tours`, {
           id: this.getCookieValue("id"),
-          category: this.$route.path.slice(1, -6),
+          category: 'instructorTours',
           name: this.$route.query.name,
         });
         this.INFO = InstructorTours.data.cards.reverse();
@@ -126,7 +134,7 @@ export default {
       if (this.$route.path == `/ads/items`) {
         let ads = await axios.post(`/ads`, {
           id: this.getCookieValue("id"),
-          category: this.$route.path.slice(1, -6),
+          category: 'ads',
           name: this.$route.query.name,
         });
         this.INFO = ads.data.cards.reverse();
@@ -282,10 +290,11 @@ export default {
     },
   },
   async mounted() {
-    this.loadCategory();
-    this.check_admin();
+    await this.loadCategory();
+    await this.check_admin();
     await this.loadInfo();
-    await this.search();
+    console.log('INFO', this.INFO)
+    // await this.search();
   },
 };
 </script>

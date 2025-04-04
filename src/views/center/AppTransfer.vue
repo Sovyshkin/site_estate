@@ -500,8 +500,8 @@ export default {
     <div v-if="Transfer.length == 0 || !Transfer" class="empty">
       <img src="../../assets/search.png" alt="" /><span>Пусто</span>
     </div>
-    <div class="transfer-card-wrapper">
-      <div class="cards" v-if="Transfer">
+    <div class="transfer-card-wrapper" v-else>
+      <div class="cards">
         <app-transfer-card
           @click="
             $router.push({ path: `/transfer/card`, query: { id: card.id } })
