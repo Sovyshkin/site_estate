@@ -15,7 +15,7 @@ const mkdirp = require("mkdirp");
 const nodemailer = require("nodemailer");
 
 const TelegramApi = require("node-telegram-bot-api");
-const tokenBot = "6512089922:AAHB9BFiyZpC6PBMWz3AQJ0HO9Hyh38qO2c";
+const tokenBot = "6512089922:AAGaY-h4GZ6mHt9H32Aio6Tup1hxp0lnMC8";
 
 // let bot = false;
 
@@ -77,7 +77,7 @@ app.listen(port, function () {
 });
 
 var corsOptions = {
-  origin: "http://localhost:8081",
+  origin: "http://localhost:8080",
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,

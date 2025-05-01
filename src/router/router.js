@@ -347,6 +347,11 @@ const router = createRouter({
       name: "myreq",
       component: MyReq,
     },
+    {
+      path: '/map',
+      name: 'appmap',
+      component: () => import('../views/info/AppMap.vue')
+    }
   ],
 });
 

@@ -1,6 +1,5 @@
 <script>
-import { RouterLink, RouterView } from "vue-router";
-
+/* eslint-disable */
 export default {
   data() {
     return {};
