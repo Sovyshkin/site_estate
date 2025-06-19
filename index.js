@@ -15,9 +15,8 @@ const mkdirp = require("mkdirp");
 const nodemailer = require("nodemailer");
 
 const TelegramApi = require("node-telegram-bot-api");
-const tokenBot = "6512089922:AAGaY-h4GZ6mHt9H32Aio6Tup1hxp0lnMC8";
+const tokenBot = "6512089922:AAEptwoMqx5ng6luu7U-s2acib6EJel5QHc";
 
-// let bot = false;
 
 let bot = new TelegramApi(tokenBot, { polling: true });
 
@@ -919,6 +918,7 @@ app.post(`/card`, async function (req, res) {
     let number;
     let reqs = [];
     console.log(id, name, view);
+    
     if (name == `habitation`) {
       if (view) {
         card = await HotelModel.findOne({
@@ -935,45 +935,59 @@ app.post(`/card`, async function (req, res) {
           where: { HotelModelId: id, done: false },
         });
       }
-      if (card) {
-        if (clientID == card.userID) {
-          reqs = await ReqBrone.findAll({ where: { cardID: id, done: false } });
-        }
+      if (card && clientID == card.userID) {
+        reqs = await ReqBrone.findAll({ where: { cardID: id, done: false } });
       }
     } else {
       console.log("info", name, id);
       card = await CardModel.findOne({
         where: { id: id },
       });
-      if (card) {
-        if (clientID == card.userID) {
-          reqs = await ReqBrone.findAll({ where: { cardID: id, done: false } });
-        }
+      if (card && clientID == card.userID) {
+        reqs = await ReqBrone.findAll({ where: { cardID: id, done: false } });
       }
     }
-    let client = await UserModel.findOne({ where: { id: clientID } });
+    
+    // Если card не найден, возвращаем ошибку
+    if (!card) {
+      return res.status(404).send({ error: "Card not found" });
+    }
+    
     let paid = false;
-    if (client) {
-      if (client.paid) {
+    let phone = null;
+    let user = null;
+    
+    // Получаем информацию о клиенте только если передан clientID
+    if (clientID) {
+      let client = await UserModel.findOne({ where: { id: clientID } });
+      if (client && client.paid) {
         paid = client.paid.find((item) => item.name == name && item.id == id);
       }
       console.log(paid);
-    }
-    let user = await UserModel.findOne({ where: { id: card.userID } });
-    let phone;
-    if (clientID) {
-      let request = await ReqBrone.findOne({
-        where: { cardID: id, clientID: clientID, userID: user.id },
-      });
-      if (request) {
-        if (request.status == "Оплачено") {
+      
+      user = await UserModel.findOne({ where: { id: card.userID } });
+      if (user) {
+        let request = await ReqBrone.findOne({
+          where: { cardID: id, clientID: clientID, userID: user.id },
+        });
+        if (request && request.status == "Оплачено") {
           phone = user.phone;
         }
       }
     }
-    res.send({ card, number, view, countReqs: reqs.length, paid, phone });
+    
+    res.send({ 
+      card, 
+      number, 
+      view, 
+      countReqs: reqs.length, 
+      paid: paid || false, 
+      phone: phone || null 
+    });
+    
   } catch (err) {
     console.log(err);
+    res.status(500).send({ error: "Internal server error" });
   }
 });
 
