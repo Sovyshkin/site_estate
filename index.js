@@ -76,7 +76,7 @@ app.listen(port, function () {
 });
 
 var corsOptions = {
-  origin: "http://localhost:8080",
+  origin: ["http://localhost:8080", "http://31.128.43.36"],
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
