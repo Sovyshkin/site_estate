@@ -82,7 +82,7 @@ var corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200,
 };
-app.use("*", cors(corsOptions));
+app.use(cors(corsOptions));
 // Подключаем middleware для сессий
 app.use(
   session({ secret: "secret-key", resave: false, saveUninitialized: true })
